@@ -50,12 +50,6 @@ Each procedure can have help files in the procedure directory: preface.md and po
 
 ## Images
 
-
-## Images
-
-
-## Images
-
 Full URL is added automatically to the images, to use image reference in Markdown, one can place the following:
 
 ```
