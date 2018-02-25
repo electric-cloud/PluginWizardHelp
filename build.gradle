@@ -1,0 +1,51 @@
+apply plugin: 'groovy'
+apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+sourceCompatibility = '1.5'
+
+buildscript {
+    repositories {
+        jcenter()
+
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
+        classpath "commons-cli:commons-cli:1.2"
+    }
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.4.9'
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.2'
+    compile 'com.atlassian.commonmark:commonmark:0.11.0'
+    compile 'com.atlassian.commonmark:commonmark-ext-gfm-tables:0.11.0'
+    compile 'com.atlassian.commonmark:commonmark-ext-autolink:0.11.0'
+    compile 'org.yaml:snakeyaml:1.17'
+    compile group: 'org.codehaus.groovy.modules.http-builder', name: 'http-builder', version: '0.7.1'
+
+    testCompile group: 'org.spockframework', name:'spock-core', version:'1.1-groovy-2.4'
+}
+
+group = 'com.electriccloud'
+version = '1.0-SNAPSHOT'
+
+sourceSets {
+    main {
+        resources {
+            srcDirs "src/main/resources"
+        }
+    }
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.electriccloud.pluginwizardhelp.Main'
+    }
+}
+

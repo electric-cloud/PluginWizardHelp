@@ -1,0 +1,145 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta content="text/html; charset=us-ascii" http-equiv="content-type"/>
+    <title>@PLUGIN_KEY@ Plugin</title>
+    <link rel="stylesheet" href="../../plugins/@PLUGIN_NAME@/pluginhelp.css" type="text/css" media="screen"/>
+</head>
+<body>
+<div class="help">
+    <h1>@PLUGIN_KEY@</h1>
+    <p>Plugin version @PLUGIN_VERSION@</p>
+    <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade"/>
+    <h3>Overview</h3>
+    <p>${overview}</p>
+    <% if (supportedVersions) { %>
+    <p>
+        The following versions are supported:
+        <ul>
+        <% supportedVersions.each { version -> %>
+            <li>${version}</li>
+        <% } %>
+        </ul>
+    </p>
+    <% } %>
+    <h1>Contents</h1>
+    ${toc}
+    <% if (configurationProcedure) { %>
+    <div id="CreateConfiguration">
+        <a name='CreateConfiguration' id="CreateConfiguration"> </a>
+        <h2>Plugin Configurations</h2>
+
+        <p>
+            Plugin configurations are sets of parameters that apply
+            across some or all of the plugin procedures. They
+            reduce repetition of common values, create
+            predefined parameter sets for end users, and
+            securely store credentials where needed. Each configuration
+            is given a unique name that is entered in designated
+            parameters on procedures that use them.<br /><br />
+        </p>
+
+        <h3>Creating Plugin Configurations</h3>
+        <p>To create plugin configurations in ElectricFlow,
+            do these steps:</p>
+
+        <li>Go to <b>Administration</b> &gt; <b>Plugins</b> to open the Plugin Manager.</li>
+        <li>Find the @PLUGIN_NAME@ row.</li>
+        <li>Click <b>Configure</b> to open the
+             Configurations page.</li>
+        <li>Click <b>Create Configuration</b>.</li>
+        <% if (configurationProcedure.preface) { %>
+        ${configurationProcedure.preface}
+        <% } %>
+        Configuration Parameters
+        <table class="grid">
+            <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% configurationProcedure.fields.each { field -> %>
+            <tr>
+                <td <% if (field.required) print 'class="required"' %>>${field.name}</td>
+                <td>${field.documentation}</td>
+            </tr>
+            <% } %>
+            </tbody>
+        </table>
+        <% if (configurationProcedure.postface) { %>
+        ${configurationProcedure.postface}
+        <% } %>
+    </div>
+    <% } %>
+
+    <h1 id="procedures">Plugin Procedures</h1>
+    <% if (proceduresPreface) { %>
+    <p>
+        ${proceduresPreface}
+    </p>
+    <% } %>
+
+    <% procedures.each { procedure -> %>
+    <div id="${procedure.id}">
+        <h2>${procedure.name}${procedure.deprecated ? ' (DEPRECATED)' : ''}</h2>
+        <p>${procedure.description}</p>
+        <% if (procedure.preface) { %>
+        <p>
+            ${procedure.preface}
+        </p>
+        <% } %>
+        <h3>${procedure.name} Parameters</h3>
+        <table class="grid">
+            <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% procedure.fields.each { field -> %>
+            <tr>
+                <td <% if (field.required) print 'class="required"' %>>${field.name}</td>
+                <td>${field.documentation}${field.additionalDocumentation ? '<br/>' + field.additionalDocumentation : ''}</td>
+            </tr>
+            <% } %>
+            </tbody>
+        </table>
+        <% if (procedure.postface) { %>
+        <p>
+            ${procedure.postface}
+        </p>
+        <% } %>
+    </div>
+
+    <% } %>
+
+    <% if (useCases) { %>
+    <h1 id="usecases">Use Cases</h1>
+
+    <% useCases.each { useCase -> %>
+    <div id="${useCase.id}">
+        ${useCase.body}
+    </div>
+    <% } } %>
+
+    <% if (knownIssues) { %>
+    <h1 id="knownIssues">Known Issues</h1>
+    <div>
+        ${knownIssues}
+    </div>
+    <% } %>
+
+    <h1 id="releaseNotes">Release Notes</h1>
+    <% changelog.getOrderedVersions().each { version -> %>
+    <h3>@PLUGIN_KEY@ ${version.version}</h3>
+    <ul>
+        <% version.changes.each { change -> %>
+        <li>${change}</li>
+        <% } %>
+    </ul>
+    <% } %>
+</div>
+</body>
+</html>
