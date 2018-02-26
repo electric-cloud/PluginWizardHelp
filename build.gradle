@@ -1,8 +1,9 @@
 apply plugin: 'groovy'
-apply plugin: 'java'
 apply plugin: 'com.github.johnrengelman.shadow'
 
 sourceCompatibility = '1.5'
+
+defaultTasks 'shadowJar'
 
 buildscript {
     repositories {
@@ -32,15 +33,22 @@ dependencies {
     testCompile group: 'org.spockframework', name:'spock-core', version:'1.1-groovy-2.4'
 }
 
-group = 'com.electriccloud'
-version = '1.0-SNAPSHOT'
-
 sourceSets {
     main {
         resources {
             srcDirs "src/main/resources"
         }
     }
+}
+
+
+group = 'com.electriccloud'
+version = '1.0-SNAPSHOT'
+
+shadowJar {
+    baseName = 'plugin-wizard-help'
+    classifier = null
+    version = version
 }
 
 jar {
