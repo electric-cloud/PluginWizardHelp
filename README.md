@@ -61,7 +61,7 @@ Assuming that MyScreenshot.png is stored under htdocs/images folder.
 # Build
 
 ```
-./gradlew jar
+./gradlew
 ```
 
 The tool is built into fat jar and can be used right away.
