@@ -26,6 +26,8 @@ supportedVersions:
  - version 2
 ```
 
+If overview is too big, it can be moved into overview.md in the same folder. overview.md will replace overview key in metadata.yaml.
+
 changelog.yaml:
 ```
 1.0.0:
