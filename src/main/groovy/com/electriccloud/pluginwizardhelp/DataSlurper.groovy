@@ -32,7 +32,15 @@ class DataSlurper {
             logger.info("No help file exists at $HELP_FILE_PATH")
         } else {
             logger.info("Found metadata")
-            return HelpMetadata.fromYaml(helpFile)
+            def metadata = HelpMetadata.fromYaml(helpFile)
+            def overviewFile = new File(pluginFolder, "help/overview.md")
+            if (overviewFile.exists()) {
+                if (metadata.overview) {
+                    logger.warning("Overview in metadata.yaml will be overriden by overview.md")
+                }
+                metadata.overview = overviewFile.text
+            }
+            return metadata
         }
     }
 
