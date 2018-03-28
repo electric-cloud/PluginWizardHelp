@@ -30,8 +30,9 @@ public class ImageRenderer implements NodeRenderer {
             destination = "../../plugins/@PLUGIN_KEY@/" + destination
         }
 //        TODO shrink
+        String title = image.title ?: ""
         html.line()
-        html.tag("image",[src: destination, title: image.title], true)
+        html.tag("image",[src: destination, title: title], true)
         html.line()
     }
 

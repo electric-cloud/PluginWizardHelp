@@ -61,10 +61,12 @@ class DataSlurper {
 
         proceduresFolder.eachFile { File folder ->
             logger.info("Reading procedure ${folder}")
-            Procedure procedure = readProcedure(folder)
-            if (procedure.name != 'EditConfiguration' && procedure.name != 'DeleteConfiguration')
-                procedures << procedure
-            logger.info("Found procedure: ${procedure.name}")
+            if (!folder.name.endsWith("_ignore")) {
+                Procedure procedure = readProcedure(folder)
+                if (procedure.name != 'EditConfiguration' && procedure.name != 'DeleteConfiguration')
+                    procedures << procedure
+                logger.info("Found procedure: ${procedure.name}")
+            }
         }
         return procedures
     }
