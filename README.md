@@ -26,6 +26,8 @@ supportedVersions:
  - version 2
 ```
 
+If overview is too big, it can be moved into overview.md in the same folder. overview.md will replace overview key in metadata.yaml.
+
 changelog.yaml:
 ```
 1.0.0:
@@ -65,3 +67,6 @@ Assuming that MyScreenshot.png is stored under htdocs/images folder.
 ```
 
 The tool is built into fat jar and can be used right away.
+Sample usage:
+
+    java -jar build/libs/plugin-wizard-help-1.0-SNAPSHOT-all.jar -out /Users/imago/Documents/ecloud/plugins/EC-Docker/pages/help.xml -pluginFolder /Users/imago/Documents/ecloud/plugins/EC-Docker
