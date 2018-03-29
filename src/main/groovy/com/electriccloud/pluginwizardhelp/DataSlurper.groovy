@@ -4,6 +4,7 @@ import com.electriccloud.pluginwizardhelp.domain.Changelog
 import com.electriccloud.pluginwizardhelp.domain.Field
 import com.electriccloud.pluginwizardhelp.domain.HelpMetadata
 import com.electriccloud.pluginwizardhelp.domain.Procedure
+import com.electriccloud.pluginwizardhelp.exceptions.SlurperException
 import groovy.util.slurpersupport.NodeChild
 import org.yaml.snakeyaml.Yaml
 
@@ -173,15 +174,27 @@ def procedure(params, name, closure) {
     retval.description = params.description
     return retval
 }
+
+def procedure(name, closure) {
+    def retval = [:]
+    retval.name = name
+    retval.description = ''
+    return retval
+}
 '''
-        def procedureMetadata = Eval.me(dslCode + "\n" + getProcedureDsl(procedureFolder))
+        def procedureMetadata = [:]
+        try {
+            procedureMetadata = Eval.me(dslCode + "\n" + getProcedureDsl(procedureFolder))
+        } catch (Throwable e) {
+            throw new SlurperException("Cannot eval procedure.dsl for ${procedureFolder.name}: ${e.getMessage()}")
+        }
         if (!procedureMetadata.name) {
-            logger.warning("Procedure in ${procedureFolder} does not have a name")
-            throw new RuntimeException("Procedure does not have a name")
+            logger.warning("Procedure in folder ${procedureFolder.name} does not have a name")
+            throw new SlurperException("Procedure in folder ${procedureFolder.name} does not have a name")
         }
         if (!procedureMetadata.description) {
-            logger.warning("Procedure in ${procedureFolder} does not have a description")
-            throw new RuntimeException("Procedure does not have a description")
+            logger.warning("Procedure in ${procedureFolder.name} does not have a description")
+            throw new SlurperException("Procedure in folder ${procedureFolder.name} does not have a description")
         }
         procedureMetadata
     }
