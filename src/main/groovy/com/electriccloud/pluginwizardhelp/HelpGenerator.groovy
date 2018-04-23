@@ -86,6 +86,13 @@ class HelpGenerator {
         proc.fields.each { field ->
             field.additionalDocumentation = markdownToHtml(field.additionalDocumentation)
         }
+        if (proc.description) {
+            if (proc.description =~ /html/) {
+                String description = proc.description
+                description = description.replaceAll(/<\/?html>/, '')
+                proc.description = description
+            }
+        }
         proc
     }
 
