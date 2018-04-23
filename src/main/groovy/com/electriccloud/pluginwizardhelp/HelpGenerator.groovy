@@ -87,13 +87,24 @@ class HelpGenerator {
             field.additionalDocumentation = markdownToHtml(field.additionalDocumentation)
         }
         if (proc.description) {
-            if (proc.description =~ /html/) {
-                String description = proc.description
+            String description = proc.description
+            if (description =~ /html/) {
                 description = description.replaceAll(/<\/?html>/, '')
-                proc.description = description
             }
+            if (isPlainText(description)) {
+                description = "<p>$description</p>".toString()
+            }
+            proc.description = description
         }
         proc
+    }
+
+
+    boolean isPlainText(String text) {
+        if (text =~ /<|\/>/) {
+            return false
+        }
+        return true
     }
 
     private List generateUseCases() {
