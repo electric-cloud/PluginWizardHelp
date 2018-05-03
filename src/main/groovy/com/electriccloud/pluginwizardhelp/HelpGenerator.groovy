@@ -14,14 +14,16 @@ import org.commonmark.renderer.NodeRenderer
 import org.commonmark.renderer.html.HtmlNodeRendererContext
 import org.commonmark.renderer.html.HtmlNodeRendererFactory
 import org.commonmark.renderer.html.HtmlRenderer
-import org.commonmark.node.*;
+import org.commonmark.node.*
 
-
+import java.text.SimpleDateFormat;
 import java.util.logging.Logger
 
 class HelpGenerator {
 
     String pluginFolder
+    String revisionDate
+
     @Lazy(soft = true)
     DataSlurper slurper = { new DataSlurper(this.pluginFolder) }()
     @Lazy
@@ -50,6 +52,22 @@ class HelpGenerator {
             .build()
     }()
 
+    @Lazy
+    String revisionDateFormat = {
+        if (revisionDate == 'false') {
+            def date = new Date()
+            SimpleDateFormat format = new SimpleDateFormat("MMMMMMMMM dd, yyyy")
+            return format.format(date)
+
+        }
+        else if (revisionDate == "-1") {
+            return ""
+        }
+        else {
+            return revisionDate
+        }
+    }()
+
     Logger logger = Logger.getLogger("")
 
     String generate() {
@@ -68,6 +86,7 @@ class HelpGenerator {
             changelog = this.slurper.changelog
             useCases = this.generateUseCases()
             knownIssues = markdownToHtml(this.slurper.metadata.knownIssues)
+            revisionDate = this.revisionDateFormat
         }
 
         def template = getTemplate("page.html")

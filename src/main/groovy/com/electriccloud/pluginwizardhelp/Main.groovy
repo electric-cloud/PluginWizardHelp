@@ -6,8 +6,9 @@ class Main {
     public static void main(String[] args) {
         def cli = new CliBuilder(usage: 'java -jar <plugin-help-builder.jar> [options]')
         cli.help('Print utility help')
-        cli.pluginFolder(args: 1, argName: 'pluginFolder', 'Folder with PluginWizard plugin')
-        cli.out(args: 1, 'Output file')
+        cli.pluginFolder(args: 1, argName: 'pluginFolder', 'Folder with PluginWizard plugin', required: true)
+        cli.out(args: 1, 'Output file', required: true)
+        cli.revisionDate(args: 1, argName: 'revision-date', 'Custom revision date or -1 for no revision date', required: false)
         def options = cli.parse(args)
 
         if (!options) {
@@ -21,13 +22,15 @@ class Main {
         }
         def path = options.pluginFolder
         def outPath = options.out
+        String revisionDate = options.revisionDate
+
         if (!path || !outPath) {
             cli.usage()
             System.exit(-1)
         }
 
         assert path
-        def generator = new HelpGenerator(pluginFolder: path)
+        def generator = new HelpGenerator(pluginFolder: path, revisionDate: revisionDate)
         String help = generator.generate()
         new Validator().validate(help)
         File output = new File(outPath)

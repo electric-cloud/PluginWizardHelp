@@ -13,6 +13,9 @@
 <div class="help">
     <h1>@PLUGIN_KEY@</h1>
     <p>Plugin version @PLUGIN_VERSION@</p>
+    <% if (revisionDate) { %>
+    <p>Revised on ${revisionDate}</p>
+    <% } %>
     <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade"/>
     <h3>Overview</h3>
     <p>${overview}</p>
