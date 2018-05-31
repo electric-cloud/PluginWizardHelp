@@ -19,13 +19,22 @@ import org.commonmark.node.*
 import java.text.SimpleDateFormat;
 import java.util.logging.Logger
 
-class HelpGenerator {
+class HelpGenerator implements Constants {
 
     String pluginFolder
     String revisionDate
 
     @Lazy(soft = true)
-    DataSlurper slurper = { new DataSlurper(this.pluginFolder) }()
+    DataSlurper slurper = {
+        PluginType type = PluginType.guessPluginType(new File(this.pluginFolder))
+        if (type == PluginType.GRADLE) {
+            def slurper = new GradleDataSlurper(this.pluginFolder)
+            return slurper
+        }
+        else {
+            return new DataSlurper(this.pluginFolder)
+        }
+    }()
     @Lazy
     List<Extension> extensions = {
         Arrays.asList(TablesExtension.create(), AutolinkExtension.create())
@@ -79,7 +88,8 @@ class HelpGenerator {
             toc = generateToc()
             releaseNotes = generateReleaseNotes()
             metadata = this.slurper.metadata
-            configurationProcedure = grabProcedureParameters(getConfigurationProcedure())
+            def configProcedure = getConfigurationProcedure()
+            configurationProcedure = configProcedure ? grabProcedureParameters(configProcedure) : null
             proceduresPreface = markdownToHtml(this.slurper.metadata.proceduresPreface)
             overview = markdownToHtml(this.slurper.metadata.overview)
             supportedVersions = this.slurper.metadata.supportedVersions
@@ -167,7 +177,6 @@ class HelpGenerator {
         }
     }
 
-
     private Template getTemplate(String name) {
         def pageTemplateText = getClass()
             .getClassLoader()
@@ -203,7 +212,7 @@ class HelpGenerator {
         if (this.slurper.metadata.excludeProcedures) {
             exclude = this.slurper.metadata.excludeProcedures
         }
-        exclude << 'CreateConfiguration'
+        exclude << CREATE_CONFIGURATION
         exclude << 'EditConfiguration'
         exclude << 'DeleteConfiguration'
         def proceduresOrder = this.slurper.metadata.proceduresOrder
