@@ -4,6 +4,7 @@ import com.electriccloud.pluginwizardhelp.domain.Changelog
 import com.electriccloud.pluginwizardhelp.domain.Field
 import com.electriccloud.pluginwizardhelp.domain.HelpMetadata
 import com.electriccloud.pluginwizardhelp.domain.Procedure
+import com.electriccloud.pluginwizardhelp.exceptions.InvalidPlugin
 import com.electriccloud.pluginwizardhelp.exceptions.SlurperException
 import groovy.util.slurpersupport.NodeChild
 import org.yaml.snakeyaml.Yaml
@@ -31,6 +32,7 @@ class DataSlurper {
         def helpFile = new File(pluginFolder, HELP_FILE_PATH)
         if (!helpFile.exists()) {
             logger.info("No help file exists at $HELP_FILE_PATH")
+            throw new InvalidPlugin("No help metadata file exists at $HELP_FILE_PATH")
         } else {
             logger.info("Found metadata")
             def metadata = HelpMetadata.fromYaml(helpFile)
@@ -41,6 +43,9 @@ class DataSlurper {
                 }
                 metadata.overview = overviewFile.text
             }
+            else {
+                logger.info("Overview file does not exist. Consider placing it under ${overviewFile.absolutePath}.")
+            }
             return metadata
         }
     }
@@ -48,7 +53,7 @@ class DataSlurper {
     Changelog readChangelog() {
         def changelogFile = new File(pluginFolder, "help/changelog.yaml")
         if (!changelogFile.exists()) {
-            logger.info("Changelog is not found, please place changelog.yaml into help folder.")
+            throw new InvalidPlugin("Changelog does not exist at ${changelogFile.absolutePath}")
         } else {
             logger.info("Found changelog")
             Changelog changelog = Changelog.fromYaml(changelogFile)
@@ -76,7 +81,7 @@ class DataSlurper {
         List cases = []
         def useCasesFolder = new File(pluginFolder, "help/UseCases")
         if (!useCasesFolder.exists()) {
-            logger.info("UseCases folder does not exist in the help folder")
+            logger.info("UseCases folder does not exist in the help folder, consider placing use cases under ${useCasesFolder.absolutePath}")
         } else {
             def files = []
             useCasesFolder.eachFile { file ->
@@ -104,8 +109,7 @@ class DataSlurper {
             fields: fields
         )
         procedure = withMetadata(procedure, procedureFolder)
-        def procedureHelp = new File(procedureFolder, "help.yaml")
-        procedure
+        return procedure
     }
 
 

@@ -13,7 +13,7 @@ overview: Plugin overview
 excludeProcedures:
   - Procedure Name
 deprecatedProcedures:
-  - Procedure Name 
+  - Procedure Name
 proceduresOrder:
   - First Procedure
   - Second Procedure
@@ -55,7 +55,7 @@ Each procedure can have help files in the procedure directory: preface.md and po
 Full URL is added automatically to the images, to use image reference in Markdown, one can place the following:
 
 ```
-![Image](images/MyScreenshot.png)	
+![Image](images/MyScreenshot.png)
 ```
 Assuming that MyScreenshot.png is stored under htdocs/images folder.
 
@@ -70,3 +70,11 @@ The tool is built into fat jar and can be used right away.
 Sample usage:
 
     java -jar build/libs/plugin-wizard-help-1.0-SNAPSHOT-all.jar -out /Users/imago/Documents/ecloud/plugins/EC-Docker/pages/help.xml -pluginFolder /Users/imago/Documents/ecloud/plugins/EC-Docker
+
+
+# Gradle Plugins
+
+There are some alterations for Gradle based plugins. Folder help/ still stands, holding metadata and changelog,
+project.xml and manifest.xml will be scanned for procedures and their respective forms.
+
+Procedures metadata can be stored in help/procedures/<ProcedureName> folder, e.g. help/procedures/CreateOrUpdateConnectionFactory/preface.md.
