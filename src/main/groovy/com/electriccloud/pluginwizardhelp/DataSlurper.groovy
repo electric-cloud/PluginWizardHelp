@@ -4,6 +4,7 @@ import com.electriccloud.pluginwizardhelp.domain.Changelog
 import com.electriccloud.pluginwizardhelp.domain.Field
 import com.electriccloud.pluginwizardhelp.domain.HelpMetadata
 import com.electriccloud.pluginwizardhelp.domain.Procedure
+import com.electriccloud.pluginwizardhelp.exceptions.InvalidPlugin
 import com.electriccloud.pluginwizardhelp.exceptions.SlurperException
 import groovy.util.slurpersupport.NodeChild
 import org.yaml.snakeyaml.Yaml
@@ -27,10 +28,11 @@ class DataSlurper {
         this.pluginFolder = pluginFolder
     }
 
-    private HelpMetadata readHelpMetadata() {
+    HelpMetadata readHelpMetadata() {
         def helpFile = new File(pluginFolder, HELP_FILE_PATH)
         if (!helpFile.exists()) {
             logger.info("No help file exists at $HELP_FILE_PATH")
+            throw new InvalidPlugin("No help metadata file exists at $HELP_FILE_PATH")
         } else {
             logger.info("Found metadata")
             def metadata = HelpMetadata.fromYaml(helpFile)
@@ -41,14 +43,17 @@ class DataSlurper {
                 }
                 metadata.overview = overviewFile.text
             }
+            else {
+                logger.info("Overview file does not exist. Consider placing it under ${overviewFile.absolutePath}.")
+            }
             return metadata
         }
     }
 
-    private Changelog readChangelog() {
+    Changelog readChangelog() {
         def changelogFile = new File(pluginFolder, "help/changelog.yaml")
         if (!changelogFile.exists()) {
-            logger.info("Changelog is not found, please place changelog.yaml into help folder.")
+            throw new InvalidPlugin("Changelog does not exist at ${changelogFile.absolutePath}")
         } else {
             logger.info("Found changelog")
             Changelog changelog = Changelog.fromYaml(changelogFile)
@@ -56,7 +61,7 @@ class DataSlurper {
         }
     }
 
-    private List<Procedure> readProcedures() {
+    List<Procedure> readProcedures() {
         List procedures = []
         def proceduresFolder = new File(pluginFolder, "dsl/procedures")
 
@@ -72,11 +77,11 @@ class DataSlurper {
         return procedures
     }
 
-    private List<String> readUseCases() {
+    List<String> readUseCases() {
         List cases = []
         def useCasesFolder = new File(pluginFolder, "help/UseCases")
         if (!useCasesFolder.exists()) {
-            logger.info("UseCases folder does not exist in the help folder")
+            logger.info("UseCases folder does not exist in the help folder, consider placing use cases under ${useCasesFolder.absolutePath}")
         } else {
             def files = []
             useCasesFolder.eachFile { file ->
@@ -95,7 +100,7 @@ class DataSlurper {
         cases
     }
 
-    private Procedure readProcedure(File procedureFolder) {
+    Procedure readProcedure(File procedureFolder) {
         def procedureMetadata = readProcedureMetadata(procedureFolder)
         def fields = readFields(getFormXml(procedureFolder))
         def procedure = new Procedure(
@@ -103,9 +108,13 @@ class DataSlurper {
             description: procedureMetadata.description,
             fields: fields
         )
+        procedure = withMetadata(procedure, procedureFolder)
+        return procedure
+    }
 
 
-        def procedureHelp = new File(procedureFolder, "help.yaml")
+    Procedure withMetadata(Procedure procedure, File metadataFolder) {
+        def procedureHelp = new File(metadataFolder, "help.yaml")
         if (procedureHelp.exists()) {
             def help = new Yaml().load(new FileReader(procedureHelp))
             procedure.preface = help.preface
@@ -122,31 +131,28 @@ class DataSlurper {
             logger.info("Procedure help file does not exist for procedure ${procedure.name}")
         }
 
-        if (!procedure.preface) {
-            procedure.preface = getProcedurePreface(procedureFolder)
-        }
-        if (!procedure.postface) {
-            procedure.postface = getProcedurePostface(procedureFolder)
-        }
+        procedure.preface ?: getProcedurePreface(metadataFolder)
+        procedure.postface ?: getProcedurePostface(metadataFolder)
         if (procedure.preface) {
             logger.info("Found preface for ${procedure.name}")
         }
         if (procedure.postface) {
             logger.info("Found postface for ${procedure.name}")
         }
-        procedure.postface ?: getProcedurePostface(procedureFolder)
-
-        if (this.metadata.deprecatedProcedures && this.metadata.deprecatedProcedures.find {
-            it == procedure.name
-        }) {
-            procedure.deprecated = true
-        }
-
-        procedure
-
+        procedure.deprecated = isDeprecated(procedure)
+        return procedure
     }
 
-    private String getProcedurePreface(procedureFolder) {
+    boolean isDeprecated(Procedure proc) {
+        if (this.metadata.deprecatedProcedures && this.metadata.deprecatedProcedures.find {
+            it == proc.name
+        }) {
+            return true
+        }
+        return false
+    }
+
+    String getProcedurePreface(procedureFolder) {
         File file = new File(procedureFolder, "preface.md")
         if (file.exists()) {
             return file.text
@@ -156,7 +162,7 @@ class DataSlurper {
         }
     }
 
-    private String getProcedurePostface(procedureFolder) {
+    String getProcedurePostface(procedureFolder) {
         File file = new File(procedureFolder, "postface.md")
         if (file.exists()) {
             return file.text
@@ -166,7 +172,7 @@ class DataSlurper {
         }
     }
 
-    private Map readProcedureMetadata(File procedureFolder) {
+    Map readProcedureMetadata(File procedureFolder) {
         def dslCode = '''
 def procedure(params, name, closure) {
     def retval = [:]
@@ -207,7 +213,7 @@ def procedure(name, closure) {
         new File(folder, "form.xml").text
     }
 
-    private List<Field> readFields(String formXml) {
+    List<Field> readFields(String formXml) {
         def form = new XmlSlurper().parseText(formXml)
         def fields = form.formElement.collect { element ->
             def name = element.label.toString().replaceAll(':', '')
@@ -228,7 +234,7 @@ def procedure(name, closure) {
         fields
     }
 
-    private String extractHtmlDocumentation(NodeChild element) {
+    String extractHtmlDocumentation(NodeChild element) {
         assert element.htmlDocumentation.toString()
         Iterator it = element.childNodes()
         def htmlDocumentation
@@ -247,7 +253,7 @@ def procedure(name, closure) {
 
     }
 
-    private void processNestedNode(StringWriter writer, def child) {
+    void processNestedNode(StringWriter writer, def child) {
         if (child.hasProperty('name')) {
             def tag = child.name
             writer.write("<" + tag)
