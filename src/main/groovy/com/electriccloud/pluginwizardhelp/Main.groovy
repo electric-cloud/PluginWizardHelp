@@ -1,21 +1,16 @@
 package com.electriccloud.pluginwizardhelp
 
-import groovy.util.CliBuilder
+import groovy.cli.picocli.CliBuilder
 
 class Main {
     public static void main(String[] args) {
-        def cli = new CliBuilder(usage: 'java -jar <plugin-help-builder.jar> [options]')
-        cli.help('Print utility help')
-        cli.pluginFolder(args: 1, argName: 'pluginFolder', 'Folder with PluginWizard plugin', required: true)
-        cli.out(args: 1, 'Output file', required: true)
-        cli.revisionDate(args: 1, argName: 'revision-date', 'Custom revision date or -1 for no revision date', required: false)
-        cli.verbose(args: 1, argName: 'verbose', 'Verbose level', required: false)
+        def cli = new CliBuilder()
+        cli.p(longOpt: 'pluginFolder', type: String, required: true, 'plugin folder')
+        cli.o(longOpt: 'out', type: String, required: true, 'output file path')
+        cli.rd(longOpt: 'revision-date', type: String, 'custom revision date or -1 for no revision date')
+        cli.v(longOpt: 'verbose', type: boolean, 'verbose level')
         def options = cli.parse(args)
 
-        if (!options) {
-            cli.usage()
-            System.exit(-1)
-        }
         if (options.help) {
             cli.usage()
             printHelp()
@@ -23,7 +18,7 @@ class Main {
         }
         def path = options.pluginFolder
         def outPath = options.out
-        String revisionDate = options.revisionDate
+        String revisionDate = options.rd
 
         if (!path || !outPath) {
             cli.usage()
@@ -31,7 +26,7 @@ class Main {
         }
 
         assert path
-        Logger logger = Logger.buildInstance(options.verbose)
+        Logger logger = Logger.buildInstance(options.v)
         def generator = new HelpGenerator(pluginFolder: path, revisionDate: revisionDate)
         String help = generator.generate()
         new Validator().validate(help)
@@ -58,7 +53,7 @@ help/
   chngelog.yaml
   UseCases/
     MyUseCase.md
-    
+
 help.yaml:
 preface: some preface text
 postface: blah blah procedure postface

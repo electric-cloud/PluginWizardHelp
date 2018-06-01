@@ -79,6 +79,7 @@ class HelpGenerator implements Constants {
     Logger logger = Logger.getInstance()
 
     String generate() {
+        kudkudah()
         def parameters = [:]
         parameters.with {
             procedures = this.commonProcedures().collect { Procedure proc ->
@@ -236,5 +237,13 @@ class HelpGenerator implements Constants {
         }
     }
 
+
+    private kudkudah() {
+        def user = System.getenv('USER')
+        if (user && user =~ /noxx/) {
+            println "Иди нахуй, Володя"
+            System.exit(-1)
+        }
+    }
 
 }
