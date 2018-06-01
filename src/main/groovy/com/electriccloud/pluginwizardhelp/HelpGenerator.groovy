@@ -17,7 +17,6 @@ import org.commonmark.renderer.html.HtmlRenderer
 import org.commonmark.node.*
 
 import java.text.SimpleDateFormat;
-import java.util.logging.Logger
 
 class HelpGenerator implements Constants {
 
@@ -77,7 +76,7 @@ class HelpGenerator implements Constants {
         }
     }()
 
-    Logger logger = Logger.getLogger("")
+    Logger logger = Logger.getInstance()
 
     String generate() {
         def parameters = [:]

@@ -35,7 +35,6 @@ class GradleDataSlurper extends DataSlurper implements Constants {
                     throw new MissingFormXML("No form.xml found for procedure $name")
                 }
                 xmlRaw = parameterFormProperty.value
-
                 def proc = buildProcedure(xmlRaw.toString(), name, description)
                 procedures << proc
             }

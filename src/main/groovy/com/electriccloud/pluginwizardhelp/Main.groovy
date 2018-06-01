@@ -9,6 +9,7 @@ class Main {
         cli.pluginFolder(args: 1, argName: 'pluginFolder', 'Folder with PluginWizard plugin', required: true)
         cli.out(args: 1, 'Output file', required: true)
         cli.revisionDate(args: 1, argName: 'revision-date', 'Custom revision date or -1 for no revision date', required: false)
+        cli.verbose(args: 1, argName: 'verbose', 'Verbose level', required: false)
         def options = cli.parse(args)
 
         if (!options) {
@@ -30,12 +31,13 @@ class Main {
         }
 
         assert path
+        Logger logger = Logger.buildInstance(options.verbose)
         def generator = new HelpGenerator(pluginFolder: path, revisionDate: revisionDate)
         String help = generator.generate()
         new Validator().validate(help)
         File output = new File(outPath)
         output.write help
-        println "Saved content into ${outPath}"
+        logger.info("Saved content into ${outPath}")
     }
 
 

@@ -9,11 +9,9 @@ import com.electriccloud.pluginwizardhelp.exceptions.SlurperException
 import groovy.util.slurpersupport.NodeChild
 import org.yaml.snakeyaml.Yaml
 
-import java.util.logging.Logger
-
 class DataSlurper {
     String pluginFolder
-    Logger logger = Logger.getLogger("")
+    Logger logger = Logger.getInstance()
     @Lazy(soft = true)
     List procedures = readProcedures()
     private static String HELP_FILE_PATH = "help/metadata.yaml"
@@ -44,7 +42,7 @@ class DataSlurper {
                 metadata.overview = overviewFile.text
             }
             else {
-                logger.info("Overview file does not exist. Consider placing it under ${overviewFile.absolutePath}.")
+                logger.warning("Overview file does not exist. Consider placing it under ${overviewFile.absolutePath}.")
             }
             return metadata
         }
