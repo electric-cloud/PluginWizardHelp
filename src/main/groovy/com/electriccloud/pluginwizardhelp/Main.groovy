@@ -11,7 +11,7 @@ class Main {
         cli.v(longOpt: 'verbose', type: boolean, 'verbose level')
         def options = cli.parse(args)
 
-        if (options.help) {
+        if (!options || options.help) {
             cli.usage()
             printHelp()
             System.exit(0)
