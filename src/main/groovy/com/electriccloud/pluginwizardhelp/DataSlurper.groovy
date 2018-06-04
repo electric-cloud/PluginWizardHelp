@@ -129,8 +129,8 @@ class DataSlurper {
             logger.info("Procedure help file does not exist for procedure ${procedure.name}")
         }
 
-        procedure.preface ?: getProcedurePreface(metadataFolder)
-        procedure.postface ?: getProcedurePostface(metadataFolder)
+        procedure.preface = procedure.preface ?: getProcedurePreface(metadataFolder)
+        procedure.postface = procedure.postface ?: getProcedurePostface(metadataFolder)
         if (procedure.preface) {
             logger.info("Found preface for ${procedure.name}")
         }
