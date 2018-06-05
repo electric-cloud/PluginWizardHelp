@@ -3,18 +3,13 @@ package com.electriccloud.pluginwizardhelp
 import com.electriccloud.pluginwizardhelp.domain.Procedure
 import com.electriccloud.pluginwizardhelp.exceptions.MissingFormXML
 
-import javax.xml.parsers.DocumentBuilderFactory
-import javax.xml.transform.TransformerFactory
-import javax.xml.transform.dom.DOMSource
-import javax.xml.transform.stream.StreamResult
-import javax.xml.xpath.XPathConstants
-import javax.xml.xpath.XPathFactory
-
 class GradleDataSlurper extends DataSlurper implements Constants {
 
     GradleDataSlurper(String pluginFolder) {
         super(pluginFolder)
     }
+
+    Map forms = [:]
 
     @Override
     List<Procedure> readProcedures() {
@@ -24,25 +19,21 @@ class GradleDataSlurper extends DataSlurper implements Constants {
         projectXml.project.procedure.each { def procedure ->
             String name = procedure.procedureName
             String description = procedure.description
-            def parameterFormProperty = procedure.propertySheet.property.find {
-                it.propertyName == 'ec_parameterForm'
-            }
+
             def xmlRaw
             if (isConfigurationProcedure(name)) {
                 foundConfig = true
             } else {
-                if (!parameterFormProperty) {
+                xmlRaw = forms[name]
+                if (!xmlRaw) {
                     throw new MissingFormXML("No form.xml found for procedure $name")
                 }
-                xmlRaw = parameterFormProperty.value
                 def proc = buildProcedure(xmlRaw.toString(), name, description)
                 procedures << proc
             }
         }
         if (foundConfig) {
-            def configXml = projectXml.'**'.find {
-                it.propertyName =~ /CreateConfig/
-            }.value
+            def configXml = forms[CREATE_CONFIGURATION]
             procedures << buildProcedure(configXml.toString(), CREATE_CONFIGURATION, "")
         }
         return procedures
@@ -68,28 +59,35 @@ class GradleDataSlurper extends DataSlurper implements Constants {
 
     def readProjectXML() {
         def projectPath = new File(this.pluginFolder, "src/main/resources/project").absolutePath
-        def xml = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-        def xmlp = XPathFactory.newInstance().newXPath()
-
-        def projectXml = xml.parse("$projectPath/project.xml")
-        def replacements = xml.parse("$projectPath/manifest.xml")
-
-        xmlp.evaluate("//file", replacements.documentElement, XPathConstants.NODESET).each {
-            def file = "$projectPath/${xmlp.evaluate('path', it)}"
-            def xpath = xmlp.evaluate('xpath', it)
-            def nodes = xmlp.evaluate(xpath, projectXml.documentElement, XPathConstants.NODESET)
-            nodes.each {
-                it.setTextContent(new File(file).text)
+        def projectXml = new XmlSlurper().parse(new File(projectPath, "project.xml"))
+        def manifestXml = new XmlSlurper().parse(new File(projectPath, "manifest.xml"))
+        manifestXml.file.each { file ->
+            //procedure[procedureName="CreateOrUpdateJMSServer"]/propertySheet/property[propertyName="ec_parameterForm"]/value
+            if (file.xpath =~ /ec_parameterForm/) {
+                def group = (file.xpath =~ /procedure\[procedureName="([\w\s]+)"\]/)
+                String procedureName = group?.getAt(0)?.getAt(1)
+                if (!procedureName) {
+                    throw new RuntimeException("Cannot get procedure name: ${file.xpath}")
+                }
+                def formXml = new File(projectPath, file.path.toString())
+                if (formXml.exists()) {
+                    forms[procedureName] = formXml.text
+                }
+                else {
+                    logger.warning("File ${file.path} does not exist (mentioned in manifets.xml)")
+                }
+            }
+            else if (file.xpath =~ /ui_forms/ && file.xpath =~ /CreateConfig/) {
+                def formXml = new File(projectPath, file.path.toString())
+                if (formXml.exists()) {
+                    forms[CREATE_CONFIGURATION] = formXml.text
+                }
+                else {
+                    logger.warning("Configuration form.xml is not found")
+                }
             }
         }
-
-        def source = new DOMSource(projectXml)
-        StringWriter sw = new StringWriter()
-        def result = new StreamResult(sw)
-        def transformer = TransformerFactory.newInstance().newTransformer()
-        transformer.transform(source, result)
-        def retval = new XmlSlurper().parseText(sw.toString())
-        return retval
+        return projectXml
     }
 
 }

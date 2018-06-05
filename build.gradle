@@ -48,7 +48,7 @@ sourceSets {
 
 
 group = 'com.electriccloud'
-version = '1.1-SNAPSHOT'
+version = '1.2-SNAPSHOT'
 
 shadowJar {
     baseName = 'plugin-wizard-help'
@@ -65,8 +65,8 @@ jar {
 githubRelease {
     token = System.getenv('GITHUB_TOKEN')
     owner = "electric-cloud"
-    repo = "PluginWizardHelp" // by default this is set to your project name
-    targetCommitish = "master" // by default this is set to "master"
+    repo = "PluginWizardHelp"
+    targetCommitish = "master"
     draft = true // by default this is false
     def file = shadowJar.destinationDir.listFiles().find { it.name =~ /${shadowJar.baseName}-${version}/}
     releaseAssets = [file]
