@@ -257,10 +257,14 @@ def procedure(name, closure) {
             writer.write("<" + tag)
             if (child.hasProperty('attributes') && child.attributes.size() > 0) {
                 writer.write(' ')
+                boolean isLink
                 def attributes = child.attributes.collect {
                     "${it.key}=\"${it.value}\""
                 }
                 if (tag == 'a') {
+                    isLink = true
+                }
+                if (isLink && !attributes.find { it =~ /target/ }) {
                     attributes << 'target="_blank"'
                 }
                 writer.write(attributes.join(' '))
