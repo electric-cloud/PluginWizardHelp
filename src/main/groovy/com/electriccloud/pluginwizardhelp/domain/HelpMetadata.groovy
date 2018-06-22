@@ -10,6 +10,7 @@ class HelpMetadata {
     String knownIssues
     List<String> proceduresOrder
     List<String> deprecatedProcedures
+    String prerequisites
 
     static HelpMetadata fromYaml(File yaml) {
         def meta = new Yaml().load(new FileReader(yaml))

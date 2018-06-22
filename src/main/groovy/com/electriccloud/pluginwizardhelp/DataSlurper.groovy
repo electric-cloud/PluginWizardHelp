@@ -34,18 +34,25 @@ class DataSlurper {
         } else {
             logger.info("Found metadata")
             def metadata = HelpMetadata.fromYaml(helpFile)
-            def overviewFile = new File(pluginFolder, "help/overview.md")
-            if (overviewFile.exists()) {
-                if (metadata.overview) {
-                    logger.warning("Overview in metadata.yaml will be overriden by overview.md")
-                }
-                metadata.overview = overviewFile.text
-            }
-            else {
-                logger.warning("Overview file does not exist. Consider placing it under ${overviewFile.absolutePath}.")
-            }
+            metadata = addMetaChapter(metadata, "overview")
+            metadata = addMetaChapter(metadata, "prerequisites")
             return metadata
         }
+    }
+
+
+    def addMetaChapter(HelpMetadata metadata, String name) {
+        def chapter = new File(pluginFolder, "help/${name}.md")
+        if (chapter.exists()) {
+            if (metadata.getProperty(name)) {
+                logger.warning("$name in metadata.yaml will be overriden by ${name}.md")
+            }
+            metadata.setProperty(name, chapter.text)
+        }
+        else {
+            logger.warning("$name file does not exist. Consider placing it under ${chapter.absolutePath}.")
+        }
+        return metadata
     }
 
     Changelog readChangelog() {

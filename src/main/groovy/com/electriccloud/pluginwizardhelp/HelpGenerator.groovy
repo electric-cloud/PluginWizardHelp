@@ -87,6 +87,7 @@ class HelpGenerator implements Constants {
             }
             toc = generateToc()
             releaseNotes = generateReleaseNotes()
+            prerequisites = markdownToHtml(this.slurper.metadata.prerequisites)
             metadata = this.slurper.metadata
             def configProcedure = getConfigurationProcedure()
             configurationProcedure = configProcedure ? grabProcedureParameters(configProcedure) : null
@@ -160,6 +161,7 @@ class HelpGenerator implements Constants {
             procedures = commonProcedures()
             useCases = generateUseCases()
             knownIssues = this.slurper.metadata.knownIssues
+            prerequisites = this.slurper.metadata.prerequisites
         }
 
         def template = getTemplate("toc.html")

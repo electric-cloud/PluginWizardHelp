@@ -31,6 +31,13 @@
     <% } %>
     <h1>Contents</h1>
     ${toc}
+    <% if (prerequisites) { %>
+    <div id="prerequisites">
+        <h2>Prerequisites</h2>
+        ${prerequisites}
+    </div>
+    <% } %>
+
     <% if (configurationProcedure) { %>
     <div id="CreateConfiguration">
         <a name='CreateConfiguration' id="CreateConfiguration"> </a>
