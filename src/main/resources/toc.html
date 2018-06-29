@@ -6,13 +6,35 @@
     <% if (hasConfig) { %>
     <li><a href="#CreateConfiguration">Plugin Configuration</a></li>
     <% } %>
+
     <li><a href="#procedures">Plugin Procedures</a></li>
+    <% if (proceduresGrouping) {
+        proceduresGrouping.groups?.each { group ->
+            def groupName = group.name ?: '<Grouped Procedures>'
+            def groupDescription = group.description
+            def groupProcedures = group.procedures
+            if (groupDescription)
+                groupDescription = '<br/><i>' + groupDescription + '</i>'
+            print '<li>' + groupName + groupDescription + '</li>'
+            print '<ul>'
+            groupProcedures.each { procedure ->
+                def deprecated = procedures.find { it.name == procedure }?.deprecated ?: ''
+                if (deprecated)
+                    deprecated = ' (DEPRECATED)'
+                print "<li><a href=\"#${procedure}\">${procedure}${deprecated}</a></li>"
+            }
+            print '</ul>'
+        }
+    } else { %>
+
     <ul>
         <% procedures.each { procedure -> %>
 
         <li><a href="#${procedure.id}">${procedure.name}${procedure.deprecated ? ' (DEPRECATED)' : ''}</a></li>
         <% } %>
     </ul>
+
+    <% } // common list %>
     <% if (useCases) { %>
     <li><a href="#usecases">Use Cases</a></li>
     <ul>
