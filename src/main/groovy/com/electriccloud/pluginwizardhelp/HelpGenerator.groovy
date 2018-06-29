@@ -159,6 +159,7 @@ class HelpGenerator implements Constants {
         params.with {
             hasConfig = getConfigurationProcedure()
             procedures = commonProcedures()
+            proceduresGrouping = this.slurper.metadata.proceduresGrouping
             useCases = generateUseCases()
             knownIssues = this.slurper.metadata.knownIssues
             prerequisites = this.slurper.metadata.prerequisites
@@ -218,7 +219,12 @@ class HelpGenerator implements Constants {
         exclude << 'EditConfiguration'
         exclude << 'DeleteConfiguration'
         def proceduresOrder = this.slurper.metadata.proceduresOrder
-        this.slurper.procedures.findAll {
+
+        if (this.slurper.metadata.proceduresGrouping) {
+            proceduresOrder = generateProceduresOrder()
+            logger.warning("Procedures order will be taken from procedures grouping")
+        }
+        def orderedProcedures = this.slurper.procedures.findAll {
             !(it.name in exclude)
         }.sort { a, b ->
             if (proceduresOrder) {
@@ -237,6 +243,19 @@ class HelpGenerator implements Constants {
                 a.name <=> b.name
             }
         }
+        return orderedProcedures
+    }
+
+    def generateProceduresOrder() {
+        Map grouping = this.slurper.metadata.proceduresGrouping
+        def order = []
+        grouping?.groups?.each { group ->
+//            def name = group.name
+//            def description = group.description
+            def procedures = group.procedures ?: []
+            order += procedures
+        }
+        return order
     }
 
 
