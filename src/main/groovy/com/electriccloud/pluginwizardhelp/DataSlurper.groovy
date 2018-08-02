@@ -255,7 +255,6 @@ def procedure(name, closure) {
             processNestedNode(writer, child)
         }
         String result = writer.toString()
-        result = result.replaceAll(/>/, '&gt;').replaceAll(/</, '&lt;')
         return result
     }
 
@@ -292,6 +291,7 @@ def procedure(name, closure) {
         if (child.hasProperty('value') && child.value.size() > 0) {
             byte[] value = child.value as byte[]
             String childValue = new String(value, 'UTF-8')
+            childValue = childValue.replaceAll(/>/, '&gt;').replaceAll(/</, '&lt;')
             writer.write(childValue)
         }
     }
