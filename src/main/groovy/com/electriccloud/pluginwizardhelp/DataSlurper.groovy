@@ -254,8 +254,9 @@ def procedure(name, closure) {
         htmlDocumentation.children().each { def child ->
             processNestedNode(writer, child)
         }
-        writer.toString()
-
+        String result = writer.toString()
+        result = result.replaceAll(/>/, '&gt;').replaceAll(/</, '&lt;')
+        return result
     }
 
     void processNestedNode(StringWriter writer, def child) {
