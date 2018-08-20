@@ -16,6 +16,7 @@ class GradleDataSlurper extends DataSlurper implements Constants {
         List procedures = []
         def projectXml = readProjectXML()
         boolean foundConfig = false
+        def excluded = this.metadata.excludeProcedures
         projectXml.project.procedure.each { def procedure ->
             String name = procedure.procedureName
             String description = procedure.description
@@ -24,12 +25,14 @@ class GradleDataSlurper extends DataSlurper implements Constants {
             if (isConfigurationProcedure(name)) {
                 foundConfig = true
             } else {
-                xmlRaw = forms[name]
-                if (!xmlRaw) {
-                    throw new MissingFormXML("No form.xml found for procedure $name")
+                if (!(name in excluded)) {
+                    xmlRaw = forms[name]
+                    if (!xmlRaw) {
+                        throw new MissingFormXML("No form.xml found for procedure $name")
+                    }
+                    def proc = buildProcedure(xmlRaw.toString(), name, description)
+                    procedures << proc
                 }
-                def proc = buildProcedure(xmlRaw.toString(), name, description)
-                procedures << proc
             }
         }
         if (foundConfig) {
@@ -72,17 +75,14 @@ class GradleDataSlurper extends DataSlurper implements Constants {
                 def formXml = new File(projectPath, file.path.toString())
                 if (formXml.exists()) {
                     forms[procedureName] = formXml.text
-                }
-                else {
+                } else {
                     logger.warning("File ${file.path} does not exist (mentioned in manifets.xml)")
                 }
-            }
-            else if (file.xpath =~ /ui_forms/ && file.xpath =~ /CreateConfig/) {
+            } else if (file.xpath =~ /ui_forms/ && file.xpath =~ /CreateConfig/) {
                 def formXml = new File(projectPath, file.path.toString())
                 if (formXml.exists()) {
                     forms[CREATE_CONFIGURATION] = formXml.text
-                }
-                else {
+                } else {
                     logger.warning("Configuration form.xml is not found")
                 }
             }
