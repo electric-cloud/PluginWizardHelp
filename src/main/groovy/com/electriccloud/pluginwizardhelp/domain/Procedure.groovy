@@ -8,6 +8,9 @@ class Procedure {
     List<Field> fields
     String preface
     String postface
+//    Token to show after the procedure name in toc (e.g. "Cluster Only")
+    String token
     Map additionalFieldsDoc
+    String procedure
     boolean deprecated
 }
