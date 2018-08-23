@@ -124,6 +124,7 @@ class DataSlurper {
             def help = new Yaml().load(new FileReader(procedureHelp))
             procedure.preface = help.preface
             procedure.postface = help.postface
+            procedure.token = help.token
 
             if (help.fields) {
                 procedure.fields.each { field ->
@@ -138,6 +139,7 @@ class DataSlurper {
 
         procedure.preface = procedure.preface ?: getProcedurePreface(metadataFolder)
         procedure.postface = procedure.postface ?: getProcedurePostface(metadataFolder)
+        procedure.token = procedure.token ?: getProcedureToken(metadataFolder)
         if (procedure.preface) {
             logger.info("Found preface for ${procedure.name}")
         }
@@ -169,6 +171,17 @@ class DataSlurper {
 
     String getProcedurePostface(procedureFolder) {
         File file = new File(procedureFolder, "postface.md")
+        if (file.exists()) {
+            return file.text
+        }
+        else {
+            return null
+        }
+    }
+
+
+    String getProcedureToken(procedureFolder) {
+        File file = new File(procedureFolder, "token.md")
         if (file.exists()) {
             return file.text
         }

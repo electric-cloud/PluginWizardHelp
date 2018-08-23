@@ -21,7 +21,11 @@
                 def deprecated = procedures.find { it.name == procedure }?.deprecated ?: ''
                 if (deprecated)
                     deprecated = ' (DEPRECATED)'
-                print "<li><a href=\"#${procedure}\">${procedure}${deprecated}</a></li>"
+                def token = procedures.find { it.name == procedure }?.token ?: ''
+                if (token) {
+                    token = ' ' + token
+                }
+                print "<li><a href=\"#${procedure}\">${procedure}${token}${deprecated}</a></li>"
             }
             print '</ul>'
         }
@@ -30,7 +34,7 @@
     <ul>
         <% procedures.each { procedure -> %>
 
-        <li><a href="#${procedure.id}">${procedure.name}${procedure.deprecated ? ' (DEPRECATED)' : ''}</a></li>
+        <li><a href="#${procedure.id}">${procedure.name}${procedure.token ? ' ' + procedure.token : ''}${procedure.deprecated ? ' (DEPRECATED)' : ''}</a></li>
         <% } %>
     </ul>
 

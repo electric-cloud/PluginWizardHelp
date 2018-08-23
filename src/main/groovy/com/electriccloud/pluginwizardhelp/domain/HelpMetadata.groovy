@@ -13,6 +13,7 @@ class HelpMetadata {
     String prerequisites
     Map proceduresGrouping
 
+
     static HelpMetadata fromYaml(File yaml) {
         def meta = new Yaml().load(new FileReader(yaml))
         HelpMetadata help = new HelpMetadata(meta)

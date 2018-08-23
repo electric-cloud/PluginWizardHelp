@@ -98,6 +98,11 @@
     <% procedures.each { procedure -> %>
     <div id="${procedure.id}">
         <h2>${procedure.name}${procedure.deprecated ? ' (DEPRECATED)' : ''}</h2>
+        <% if (procedure.token) { %>
+
+        <p>${procedure.token}</p>
+
+        <% } %>
         ${procedure.description}
         <% if (procedure.preface) { %>
             ${procedure.preface}
