@@ -48,7 +48,9 @@ do that
 
 ## Procedures
 
-Each procedure can have help files in the procedure directory: preface.md and postface.md. The content will be placed before and after the procedure's documentation.
+Each procedure can have help files in the procedure directory: preface.md, token.md and postface.md.
+The content in preface and postface will be placed before and after the procedure's documentation.
+The content in token.md will be placed into TOC after the procedure name and before the procedure documentation.
 
 ## Images
 
