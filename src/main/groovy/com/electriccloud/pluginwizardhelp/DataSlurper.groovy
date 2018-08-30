@@ -181,7 +181,7 @@ class DataSlurper {
 
 
     String getProcedureToken(procedureFolder) {
-        File file = new File(procedureFolder, "token.md")
+        File file = new File(procedureFolder, "token.txt")
         if (file.exists()) {
             return file.text
         }
