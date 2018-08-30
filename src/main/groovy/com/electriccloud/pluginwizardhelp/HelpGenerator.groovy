@@ -112,9 +112,6 @@ class HelpGenerator implements Constants {
         if (proc.postface) {
             proc.postface = markdownToHtml(proc.postface)
         }
-        if (proc.token) {
-            proc.token = markdownToHtml(proc.token)
-        }
         proc.fields.each { field ->
             field.additionalDocumentation = markdownToHtml(field.additionalDocumentation)
         }
