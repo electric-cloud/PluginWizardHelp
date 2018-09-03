@@ -8,6 +8,7 @@ import com.electriccloud.pluginwizardhelp.exceptions.InvalidPlugin
 import com.electriccloud.pluginwizardhelp.exceptions.SlurperException
 import groovy.util.slurpersupport.NodeChild
 import org.yaml.snakeyaml.Yaml
+import static org.apache.commons.lang.StringEscapeUtils.escapeHtml
 
 class DataSlurper {
     String pluginFolder
@@ -304,7 +305,7 @@ def procedure(name, closure) {
         if (child.hasProperty('value') && child.value.size() > 0) {
             byte[] value = child.value as byte[]
             String childValue = new String(value, 'UTF-8')
-            childValue = childValue.replaceAll(/>/, '&gt;').replaceAll(/</, '&lt;')
+            childValue = escapeHtml(childValue)
             writer.write(childValue)
         }
     }
