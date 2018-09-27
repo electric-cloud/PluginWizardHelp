@@ -98,6 +98,7 @@ class HelpGenerator implements Constants {
             useCases = this.generateUseCases()
             knownIssues = markdownToHtml(this.slurper.metadata.knownIssues)
             revisionDate = this.revisionDateFormat
+            separateProceduresToc = this.slurper.metadata.separateProceduresToc
         }
 
         def template = getTemplate("page.html")
@@ -176,6 +177,7 @@ class HelpGenerator implements Constants {
             knownIssues = this.slurper.metadata.knownIssues
             prerequisites = this.slurper.metadata.prerequisites
             chapters = processCustomChapters(this.slurper.metadata.chapters)
+            separateProceduresToc = this.slurper.metadata.separateProceduresToc
         }
 
         def template = getTemplate("toc.html")
@@ -215,6 +217,15 @@ class HelpGenerator implements Constants {
 //        Empty lines of spaces
         help = help.replaceAll(/^\s+$/, '')
         help = help.replaceAll(/[“”]/, '"') // fucking quotes!!!!!
+
+        help.split(/\n/).each {
+            if (it =~ /[^\x00-\x7F]/) {
+                logger.warning("Found non-ascii chars in line $it")
+            }
+        }
+
+        help = help.replaceAll(/[^\x00-\x7F]/, ' ')
+
         return help
     }
 

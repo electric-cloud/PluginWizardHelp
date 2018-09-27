@@ -34,7 +34,11 @@
             }
             print '</ul>'
         }
-    } else { %>
+    }
+    else if (separateProceduresToc) {
+        // do nothing
+    }
+    else { %>
 
     <ul>
         <% procedures.each { procedure -> %>

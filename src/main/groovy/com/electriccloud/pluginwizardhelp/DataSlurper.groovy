@@ -11,14 +11,15 @@ import org.yaml.snakeyaml.Yaml
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml
 
 class DataSlurper {
-    String pluginFolder
-    Logger logger = Logger.getInstance()
-    @Lazy(soft = true)
-    List procedures = readProcedures()
     private static String HELP_FILE_PATH = "help/metadata.yaml"
     private static String HELP_FOLDER = 'help'
     private static String METADATA_GLOB = 'metadata.y*ml'
     private static String CHANGELOG_GLOB = 'changelog.y*ml'
+
+    String pluginFolder
+    Logger logger = Logger.getInstance()
+    @Lazy(soft = true)
+    List procedures = readProcedures()
     @Lazy(soft = true)
     HelpMetadata metadata = readHelpMetadata()
     @Lazy
