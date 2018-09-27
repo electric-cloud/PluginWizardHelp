@@ -3,6 +3,11 @@
     <% if (prerequisites) { %>
     <li><a href="#prerequisites">Prerequisites</a></li>
     <% } %>
+
+    <% chapters.each { chapter -> %>
+    <li><a href="#${chapter.header}">${chapter.header}</a></li>
+    <% } %>
+
     <% if (hasConfig) { %>
     <li><a href="#CreateConfiguration">Plugin Configuration</a></li>
     <% } %>

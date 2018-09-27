@@ -12,11 +12,17 @@ class HelpMetadata {
     List<String> deprecatedProcedures
     String prerequisites
     Map proceduresGrouping
+    List<String> chapters = new ArrayList<String>()
 
 
     static HelpMetadata fromYaml(File yaml) {
         def meta = new Yaml().load(new FileReader(yaml))
         HelpMetadata help = new HelpMetadata(meta)
         return help
+    }
+
+
+    def addChapter(String content) {
+        chapters << content
     }
 }

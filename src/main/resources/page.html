@@ -17,6 +17,8 @@
     <p>Revised on ${revisionDate}</p>
     <% } %>
     <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade"/>
+    <h1>Contents</h1>
+    ${toc}
     <h3>Overview</h3>
     <p>${overview}</p>
     <% if (supportedVersions) { %>
@@ -29,14 +31,21 @@
         </ul>
     </p>
     <% } %>
-    <h1>Contents</h1>
-    ${toc}
     <% if (prerequisites) { %>
     <div id="prerequisites">
         <h2>Prerequisites</h2>
         ${prerequisites}
     </div>
     <% } %>
+
+    <% chapters.each { chapter -> %>
+    <div id="${chapter.header}">
+        <h2>${chapter.header}</h2>
+        ${chapter.text}
+    </div>
+
+    <% } %>
+    <!--TODO custom blocks-->
 
     <% if (configurationProcedure) { %>
     <div id="CreateConfiguration">
@@ -103,7 +112,9 @@
         <p>${procedure.token}</p>
 
         <% } %>
+        <% if (!procedure.omitDescription) { %>
         ${procedure.description}
+        <% } %>
         <% if (procedure.preface) { %>
             ${procedure.preface}
         <% } %>

@@ -45,14 +45,17 @@ public class LinkRenderer implements NodeRenderer {
     private void validateLink(String destination) {
         def http = new HTTPBuilder(destination)
         http.ignoreSSLIssues()
-        http.request(GET, TEXT) { req ->
-            response.success = { resp, reader ->
-                logger.info("Link ${destination} is alive")
+        try {
+            http.request(GET, TEXT) { req ->
+                response.success = { resp, reader ->
+                    logger.info("Link ${destination} is alive")
+                }
+                response.failure = { resp ->
+                    logger.warning("Link ${destination} returned ${resp.status}")
+                }
             }
-            response.failure = { resp ->
-                logger.warning("Link ${destination} returned ${resp.status}")
-                throw new RuntimeException("Link ${destination} is invalid")
-            }
+        } catch (Throwable e) {
+            logger.warning("Cannot validate link $destination: ${e.message}")
         }
     }
 

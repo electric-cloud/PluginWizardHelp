@@ -61,6 +61,16 @@ Full URL is added automatically to the images, to use image reference in Markdow
 ```
 Assuming that MyScreenshot.png is stored under htdocs/images folder.
 
+## Custom Chapters
+
+Every .md document added into the help/ folder and having a name ending with "Chapter.md" is considered a custom chapter.
+The chapters are ordered by their file names and added after the "Overview" and "Prerequisites" chapters.
+Each chapter should have a header separated by ======, e.g.
+
+    My Chapter
+    ================
+    Content
+
 
 # Build
 
