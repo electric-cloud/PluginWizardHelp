@@ -11,11 +11,15 @@ import org.yaml.snakeyaml.Yaml
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml
 
 class DataSlurper {
+    private static String HELP_FILE_PATH = "help/metadata.yaml"
+    private static String HELP_FOLDER = 'help'
+    private static String METADATA_GLOB = 'metadata.y*ml'
+    private static String CHANGELOG_GLOB = 'changelog.y*ml'
+
     String pluginFolder
     Logger logger = Logger.getInstance()
     @Lazy(soft = true)
     List procedures = readProcedures()
-    private static String HELP_FILE_PATH = "help/metadata.yaml"
     @Lazy(soft = true)
     HelpMetadata metadata = readHelpMetadata()
     @Lazy
@@ -28,8 +32,8 @@ class DataSlurper {
     }
 
     HelpMetadata readHelpMetadata() {
-        def helpFile = new File(pluginFolder, HELP_FILE_PATH)
-        if (!helpFile.exists()) {
+        def helpFile = fileByGlob(new File(pluginFolder, HELP_FOLDER), METADATA_GLOB)
+        if (!helpFile || !helpFile.exists()) {
             logger.info("No help file exists at $HELP_FILE_PATH")
             throw new InvalidPlugin("No help metadata file exists at $HELP_FILE_PATH")
         } else {
@@ -37,10 +41,26 @@ class DataSlurper {
             def metadata = HelpMetadata.fromYaml(helpFile)
             metadata = addMetaChapter(metadata, "overview")
             metadata = addMetaChapter(metadata, "prerequisites")
+            metadata = addChapters(metadata)
             return metadata
         }
     }
 
+    def addChapters(HelpMetadata metadata) {
+        def order = []
+        new File(pluginFolder, "help").listFiles().each { File file ->
+            if (file.name.endsWith("Chapter.md")) {
+                logger.info("Found custom chapter ${file.name}")
+                order << file
+            }
+        }
+        order.sort {File a, File b ->
+            a.name <=> b.name
+        }.each {
+            metadata.addChapter(it.text)
+        }
+        return metadata
+    }
 
     def addMetaChapter(HelpMetadata metadata, String name) {
         def chapter = new File(pluginFolder, "help/${name}.md")
@@ -57,8 +77,8 @@ class DataSlurper {
     }
 
     Changelog readChangelog() {
-        def changelogFile = new File(pluginFolder, "help/changelog.yaml")
-        if (!changelogFile.exists()) {
+        def changelogFile = fileByGlob(new File(pluginFolder, HELP_FOLDER), CHANGELOG_GLOB)
+        if (changelogFile && !changelogFile.exists()) {
             throw new InvalidPlugin("Changelog does not exist at ${changelogFile.absolutePath}")
         } else {
             logger.info("Found changelog")
@@ -120,12 +140,13 @@ class DataSlurper {
 
 
     Procedure withMetadata(Procedure procedure, File metadataFolder) {
-        def procedureHelp = new File(metadataFolder, "help.yaml")
-        if (procedureHelp.exists()) {
+        def procedureHelp = fileByGlob(metadataFolder, "help.y*ml")
+        if (procedureHelp && procedureHelp.exists()) {
             def help = new Yaml().load(new FileReader(procedureHelp))
             procedure.preface = help.preface
             procedure.postface = help.postface
             procedure.token = help.token
+            procedure.omitDescription = help.omitDescription
 
             if (help.fields) {
                 procedure.fields.each { field ->
@@ -251,6 +272,18 @@ def procedure(name, closure) {
             )
         }
         fields
+    }
+
+
+    File fileByGlob(File folder, String pattern) {
+        def found = new FileNameFinder().getFileNames(folder.absolutePath, pattern)
+        if (found.size() > 1) {
+            throw new RuntimeException("More than one metadata file found for $pattern in $folder")
+        }
+        if (!found) {
+            return null
+        }
+        return new File(found.first())
     }
 
     String extractHtmlDocumentation(NodeChild element) {

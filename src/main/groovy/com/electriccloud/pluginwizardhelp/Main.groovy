@@ -5,8 +5,8 @@ import groovy.cli.picocli.CliBuilder
 class Main {
     public static void main(String[] args) {
         def cli = new CliBuilder()
-        cli.p(longOpt: 'pluginFolder', type: String, required: true, 'plugin folder')
-        cli.o(longOpt: 'out', type: String, required: true, 'output file path')
+        cli.p(longOpt: 'pluginFolder', type: String, required: false, 'plugin folder')
+        cli.o(longOpt: 'out', type: String, required: false, 'output file path')
         cli.rd(longOpt: 'revision-date', type: String, 'custom revision date or -1 for no revision date')
         cli.v(longOpt: 'verbose', type: boolean, 'verbose level')
         def options = cli.parse(args)
@@ -16,8 +16,20 @@ class Main {
             printHelp()
             System.exit(0)
         }
-        def path = options.pluginFolder
-        def outPath = options.out
+        def path = options.pluginFolder ?: System.getenv('PWD')
+        if (!path) {
+            println "Cannot deduce the name of the output file"
+            cli.usage()
+            printHelp()
+            System.exit(-1)
+        }
+        def outPath = options.out ?: deduceOut(path)
+        if (!outPath) {
+            println "Cannot deduce the name of the output file"
+            cli.usage()
+            printHelp()
+            System.exit(-1)
+        }
         String revisionDate = options.rd
 
         if (!path || !outPath) {
@@ -33,6 +45,16 @@ class Main {
         File output = new File(outPath)
         output.write help
         logger.info("Saved content into ${outPath}")
+    }
+
+
+    static def deduceOut(String path) {
+        File pages = new File(path, 'pages')
+        if (pages.exists()) {
+            def out = pages.listFiles().find { it.name.endsWith('help.xml') }
+            return out.absolutePath
+        }
+        return null
     }
 
 

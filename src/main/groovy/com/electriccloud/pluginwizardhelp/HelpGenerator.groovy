@@ -87,6 +87,7 @@ class HelpGenerator implements Constants {
             toc = generateToc()
             releaseNotes = generateReleaseNotes()
             prerequisites = markdownToHtml(this.slurper.metadata.prerequisites)
+            chapters = processCustomChapters(this.slurper.metadata.chapters)
             metadata = this.slurper.metadata
             def configProcedure = getConfigurationProcedure()
             configurationProcedure = configProcedure ? grabProcedureParameters(configProcedure) : null
@@ -97,12 +98,25 @@ class HelpGenerator implements Constants {
             useCases = this.generateUseCases()
             knownIssues = markdownToHtml(this.slurper.metadata.knownIssues)
             revisionDate = this.revisionDateFormat
+            separateProceduresToc = this.slurper.metadata.separateProceduresToc
         }
 
         def template = getTemplate("page.html")
         String help = template.make(parameters)
         help = cleanup(help)
         help
+    }
+
+    def processCustomChapters(List<String> chapters) {
+        def retval = []
+        for(String content: chapters) {
+            def (header, text) = content.split(/\=+/)
+            assert header : "Chapter ${content.substring(0, 100)} does not have a header"
+            text = markdownToHtml(text)
+            header = header.replaceAll(/\n/, '')
+            retval << [header: header, text: text]
+        }
+        return retval
     }
 
     private Procedure grabProcedureParameters(Procedure proc) {
@@ -162,6 +176,8 @@ class HelpGenerator implements Constants {
             useCases = generateUseCases()
             knownIssues = this.slurper.metadata.knownIssues
             prerequisites = this.slurper.metadata.prerequisites
+            chapters = processCustomChapters(this.slurper.metadata.chapters)
+            separateProceduresToc = this.slurper.metadata.separateProceduresToc
         }
 
         def template = getTemplate("toc.html")
@@ -200,6 +216,16 @@ class HelpGenerator implements Constants {
     private String cleanup(String help) {
 //        Empty lines of spaces
         help = help.replaceAll(/^\s+$/, '')
+        help = help.replaceAll(/[“”]/, '"') // fucking quotes!!!!!
+
+        help.split(/\n/).each {
+            if (it =~ /[^\x00-\x7F]/) {
+                logger.warning("Found non-ascii chars in line $it")
+            }
+        }
+
+        help = help.replaceAll(/[^\x00-\x7F]/, ' ')
+
         return help
     }
 

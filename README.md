@@ -61,6 +61,63 @@ Full URL is added automatically to the images, to use image reference in Markdow
 ```
 Assuming that MyScreenshot.png is stored under htdocs/images folder.
 
+## Custom Chapters
+
+Every .md document added into the help/ folder and having a name ending with "Chapter.md" is considered a custom chapter.
+The chapters are ordered by their file names and added after the "Overview" and "Prerequisites" chapters.
+Each chapter should have a header separated by ======, e.g.
+
+    My Chapter
+    ================
+    Content
+
+## Configuration
+
+### excludedProcedures
+
+List of the excluded procedures. Will not be mentioned in the documentation.
+
+### deprecatedProcedures
+
+List of the deprecated procedures. Will have DEPRECATED token after the procedure name.
+
+### knownIssues
+
+Text, describing known issues for the plugin.
+
+### proceduresPreface
+
+Text will be placed before the procedures list.
+
+### supportedVersions
+
+List of the supported versions of the third-party tool.
+
+### proceduresGrouping
+
+Non-default procedures grouping. E.g.
+
+    proceduresGrouping:
+      groups:
+        - name: WLS Domain Management
+          description: These procedures help in managing a WLS Domain.
+          procedures:
+            - CreateCluster
+        - name: WLS Domain Server Administration
+          description: These procedures help in administering (i.e., Starting or Stopping Servers) of a WLS Domain.
+          procedures:
+            - StartAdminServer
+            - ResumeServer
+
+Will be used for TOC generation.
+
+### proceduresOrder
+
+Ordered list of the procedure names. Will be used for default TOC. If the ordering is not provided, alphabetical order is used.
+
+### separateProceduresToc
+
+Flag. If set to true, procedures will have a separate TOC under the Procedures header.
 
 # Build
 

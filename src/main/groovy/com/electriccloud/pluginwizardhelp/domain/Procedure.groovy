@@ -13,4 +13,5 @@ class Procedure {
     Map additionalFieldsDoc
     String procedure
     boolean deprecated
+    boolean omitDescription
 }
