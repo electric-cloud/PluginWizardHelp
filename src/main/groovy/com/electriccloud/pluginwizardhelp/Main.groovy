@@ -52,7 +52,8 @@ class Main {
         File pages = new File(path, 'pages')
         if (pages.exists()) {
             def out = pages.listFiles().find { it.name.endsWith('help.xml') }
-            return out.absolutePath
+            if (out)
+                return out.absolutePath
         }
         return null
     }
