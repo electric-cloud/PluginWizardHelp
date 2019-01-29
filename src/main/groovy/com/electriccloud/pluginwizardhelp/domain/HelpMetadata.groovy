@@ -13,6 +13,9 @@ class HelpMetadata {
 //    List of the supported third-party versions
     List supportedVersions
 
+
+    String supportedVersionsText
+
 //    List of the excluded from documentation procedures
     List excludeProcedures
 

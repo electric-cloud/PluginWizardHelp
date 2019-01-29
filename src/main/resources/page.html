@@ -24,7 +24,11 @@
     <% if (supportedVersions) { %>
     <h1 id="supportedVersions">Supported Versions</h1>
     <p>
-        The plugin has been tested with the following Kubernetes versions:
+        <% if (supportedVersionsText) { %>
+        $supportedVersionsText
+        <% } else { %>
+        The plugin has been tested with the following versions:
+        <% } %>
         <ul>
         <% supportedVersions.each { version -> %>
             <li>${version}</li>

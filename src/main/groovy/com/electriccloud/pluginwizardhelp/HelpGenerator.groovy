@@ -99,6 +99,7 @@ class HelpGenerator implements Constants {
             knownIssues = markdownToHtml(this.slurper.metadata.knownIssues)
             revisionDate = this.revisionDateFormat
             separateProceduresToc = this.slurper.metadata.separateProceduresToc
+            supportedVersionsText = this.slurper.metadata.supportedVersionsText
         }
 
         def template = getTemplate("page.html")
@@ -179,6 +180,7 @@ class HelpGenerator implements Constants {
             chapters = processCustomChapters(this.slurper.metadata.chapters)
             separateProceduresToc = this.slurper.metadata.separateProceduresToc
             supportedVersions = this.slurper.metadata.supportedVersions
+
         }
 
         def template = getTemplate("toc.html")
