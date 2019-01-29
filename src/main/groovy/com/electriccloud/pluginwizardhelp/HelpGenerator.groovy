@@ -178,6 +178,7 @@ class HelpGenerator implements Constants {
             prerequisites = this.slurper.metadata.prerequisites
             chapters = processCustomChapters(this.slurper.metadata.chapters)
             separateProceduresToc = this.slurper.metadata.separateProceduresToc
+            supportedVersions = this.slurper.metadata.supportedVersions
         }
 
         def template = getTemplate("toc.html")
@@ -233,6 +234,12 @@ class HelpGenerator implements Constants {
         this.slurper.metadata.deprecatedProcedures.find {
             it.name == procedureName
         }
+    }
+
+
+    boolean isExcluded(String procedureName) {
+        def excluded = this.slurper.metadata.excludeProcedures ?: []
+        return excluded.find{ it == procedureName }
     }
 
     List<Procedure> commonProcedures() {

@@ -19,11 +19,12 @@
     <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade"/>
     <h1>Contents</h1>
     ${toc}
-    <h3>Overview</h3>
+    <h1>Overview</h1>
     <p>${overview}</p>
     <% if (supportedVersions) { %>
+    <h1 id="supportedVersions">Supported Versions</h1>
     <p>
-        The following versions are supported:
+        The plugin has been tested with the following Kubernetes versions:
         <ul>
         <% supportedVersions.each { version -> %>
             <li>${version}</li>
@@ -33,14 +34,14 @@
     <% } %>
     <% if (prerequisites) { %>
     <div id="prerequisites">
-        <h2>Prerequisites</h2>
+        <h1>Prerequisites</h1>
         ${prerequisites}
     </div>
     <% } %>
 
     <% chapters.each { chapter -> %>
     <div id="${chapter.header}">
-        <h2>${chapter.header}</h2>
+        <h1>${chapter.header}</h1>
         ${chapter.text}
     </div>
 
@@ -50,7 +51,7 @@
     <% if (configurationProcedure) { %>
     <div id="CreateConfiguration">
         <a name='CreateConfiguration' id="CreateConfiguration"> </a>
-        <h2>Plugin Configurations</h2>
+        <h1>Plugin Configurations</h1>
 
         <p>
             Plugin configurations are sets of parameters that apply

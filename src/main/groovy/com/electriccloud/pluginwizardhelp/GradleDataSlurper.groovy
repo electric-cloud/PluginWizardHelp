@@ -35,7 +35,7 @@ class GradleDataSlurper extends DataSlurper implements Constants {
                 }
             }
         }
-        if (foundConfig) {
+        if (foundConfig && !(CREATE_CONFIGURATION in excluded)) {
             def configXml = forms[CREATE_CONFIGURATION]
             procedures << buildProcedure(configXml.toString(), CREATE_CONFIGURATION, "")
         }
