@@ -173,7 +173,7 @@ class HelpGenerator implements Constants {
         params.with {
             hasConfig = getConfigurationProcedure()
             procedures = commonProcedures()
-            proceduresGrouping = this.slurper.metadata.proceduresGrouping
+            proceduresGrouping = refineProceduresGrouping(this.slurper.metadata.proceduresGrouping)
             useCases = generateUseCases()
             knownIssues = this.slurper.metadata.knownIssues
             prerequisites = this.slurper.metadata.prerequisites
@@ -186,6 +186,36 @@ class HelpGenerator implements Constants {
         def template = getTemplate("toc.html")
         String toc = template.make(params)
         return toc
+    }
+
+
+    Map refineProceduresGrouping(Map proceduresGrouping) {
+        def groupedProcedures = []
+        List<Procedure> commonProcedures = commonProcedures()
+        def groups = proceduresGrouping.groups.collect {
+            def description = it.description ?: ''
+            def name = it.name ?: 'Other'
+            groupedProcedures.addAll(it.procedures)
+            def procedures = it.procedures.collect { procedureName ->
+                Procedure proc = commonProcedures.find { it.name == procedureName }
+                proc
+            }
+            [name: name, description: description, procedures: procedures]
+        }
+        def ungroupedProcedures = []
+        for (Procedure procedure : commonProcedures) {
+            if (!(procedure.name in groupedProcedures)) {
+                ungroupedProcedures << procedure.name
+            }
+        }
+        if (ungroupedProcedures.size()) {
+            def procedures = ungroupedProcedures.sort().collect { procedureName ->
+                commonProcedures.find { it.name == procedureName}
+            }
+            def other = [name: 'Other', description: '', procedures: procedures]
+            groups << other
+        }
+        return [groups: groups]
     }
 
     private String generateReleaseNotes() {

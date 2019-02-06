@@ -19,21 +19,21 @@
     <% if (proceduresGrouping) {
         proceduresGrouping.groups?.each { group ->
             def groupName = group.name ?: '<Grouped Procedures>'
-            def groupDescription = group.description
+            def groupDescription = group.description ?: ''
             def groupProcedures = group.procedures
             if (groupDescription)
                 groupDescription = '<br/><i>' + groupDescription + '</i>'
             print '<li>' + groupName + groupDescription + '</li>'
             print '<ul>'
             groupProcedures.each { procedure ->
-                def deprecated = procedures.find { it.name == procedure }?.deprecated ?: ''
-                if (deprecated)
+                def deprecated = ''
+                if (procedure.deprecated)
                     deprecated = ' (DEPRECATED)'
-                def token = procedures.find { it.name == procedure }?.token ?: ''
+                def token = procedure.token ?: ''
                 if (token) {
                     token = ' ' + token
                 }
-                print "<li><a href=\"#${procedure}\">${procedure}${token}${deprecated}</a></li>"
+                print "<li><a href=\"#${procedure.id}\">${procedure.name}${token}${deprecated}</a></li>"
             }
             print '</ul>'
         }
