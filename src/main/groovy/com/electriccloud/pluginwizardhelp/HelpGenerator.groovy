@@ -190,9 +190,12 @@ class HelpGenerator implements Constants {
 
 
     Map refineProceduresGrouping(Map proceduresGrouping) {
+        if (!proceduresGrouping) {
+            return null
+        }
         def groupedProcedures = []
         List<Procedure> commonProcedures = commonProcedures()
-        def groups = proceduresGrouping.groups.collect {
+        def groups = proceduresGrouping?.groups.collect {
             def description = it.description ?: ''
             def name = it.name ?: 'Other'
             groupedProcedures.addAll(it.procedures)
