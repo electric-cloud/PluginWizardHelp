@@ -34,17 +34,19 @@ class HelpGeneratorTest extends Specification {
             [4, 3]    | [4, 3, 1, 2]    | [1, 2, 3, 4]
     }
 
-    def "markdown generation"() {
+    def "link generation"() {
         given:
-            HelpGenerator generator = new HelpGenerator()
+        HelpGenerator generator = new HelpGenerator()
         when:
-            def html = generator.markdownToHtml(markdown)
+        def html = generator.markdownToHtml(markdown)
         then:
-            assert html =~ /$expected/
+        assert html =~ /$expected/
         where:
-            markdown << [markdownWithLink()]
-            expected << ['<a href=']
-
+        markdown                      | expected
+        markdownWithLink()            | '<a href='
+        '[](http://i.ua "title")'     | '<a href="http://i.ua" target="_blank">title</a>'
+        '[text](http://i.ua "title")' | '<a href="http://i.ua" target="_blank" title="title">text</a>'
+        '[text](http://i.ua)'         | '<a href="http://i.ua" target="_blank">text</a>'
     }
 
 

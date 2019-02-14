@@ -32,12 +32,29 @@ public class LinkRenderer implements NodeRenderer {
         validateLink(link.destination)
 
         html.line()
-        html.tag("a", [href: link.destination, target: "_blank"])
-        if (link.title) {
-            html.text(link.title)
-        } else {
-            html.text(link.destination)
+
+        String text = ""
+        Map attributes = [href: link.destination, target: "_blank"]
+
+        if (link.firstChild){
+            text = link.firstChild.literal.toString()
         }
+
+        if (link.title) {
+            if (!text){
+                text = link.title
+            }
+            else{
+                attributes['title'] = link.title
+            }
+        }
+
+        if (!text) {
+            text = link.destination
+        }
+
+        html.tag("a", attributes)
+        html.text(text)
         html.tag("/a")
         html.line()
     }
