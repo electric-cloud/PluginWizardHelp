@@ -40,6 +40,9 @@ class HelpMetadata {
 //    Plugin help will have two tables of contents: one main in the beginning of the file and one with the procedures list under Procedures header
     boolean separateProceduresToc
 
+//    description of the procedures will not be included into help
+    boolean omitDescription
+
 
     static HelpMetadata fromYaml(File yaml) {
         def meta = new Yaml().load(new FileReader(yaml))

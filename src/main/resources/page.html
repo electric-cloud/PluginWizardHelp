@@ -126,7 +126,7 @@
         <p>${procedure.token}</p>
 
         <% } %>
-        <% if (!procedure.omitDescription) { %>
+        <% if (!procedure.omitDescription && !metadata.omitDescription) { %>
         ${procedure.description}
         <% } %>
         <% if (procedure.preface) { %>
