@@ -41,43 +41,9 @@ class DataSlurper {
             def metadata = HelpMetadata.fromYaml(helpFile)
             metadata = addMetaChapter(metadata, "overview")
             metadata = addMetaChapter(metadata, "prerequisites")
-            // metadata = addChapters(metadata)
             return metadata
         }
     }
-
-    // def addChapters(HelpMetadata metadata) {
-    //     def order = []
-    //     metadata.chapters?.each {
-    //         String file = it.file
-    //         String name = it.name
-    //         String place = it.place
-    //
-    //         if (!name) {
-    //             throw new RuntimeException("Chapter does not have a name")
-    //         }
-    //         if (!file) {
-    //             throw new RuntimeException("Chapter does not have a file")
-    //         }
-    //         File chapterFile = new File(pluginFolder, "help/$file")
-    //         if (!chapterFile.exists()) {
-    //             throw new RuntimeException("File ${file} does not exist for the chapter ${name}")
-    //         }
-    //         String content = chapterFile.text
-    //     }
-    //     // new File(pluginFolder, "help").listFiles().each { File file ->
-    //     //     if (file.name.endsWith("Chapter.md")) {
-    //     //         logger.info("Found custom chapter ${file.name}")
-    //     //         order << file
-    //     //     }
-    //     // }
-    //     // order.sort {File a, File b ->
-    //     //     a.name <=> b.name
-    //     // }.each {
-    //     //     metadata.addChapter(it.text)
-    //     // }
-    //     return metadata
-    // }
 
     def addMetaChapter(HelpMetadata metadata, String name) {
         def chapter = new File(pluginFolder, "help/${name}.md")
