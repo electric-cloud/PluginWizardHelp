@@ -3,6 +3,9 @@ package com.electriccloud.pluginwizardhelp
 import com.electriccloud.pluginwizardhelp.commonmark.HeaderVisitor
 import com.electriccloud.pluginwizardhelp.commonmark.ImageRenderer
 import com.electriccloud.pluginwizardhelp.commonmark.LinkRenderer
+import com.electriccloud.pluginwizardhelp.domain.Chapter
+import com.electriccloud.pluginwizardhelp.domain.ChapterPlace
+import com.electriccloud.pluginwizardhelp.domain.ChaptersPlacement
 import com.electriccloud.pluginwizardhelp.domain.Procedure
 import groovy.text.SimpleTemplateEngine
 import groovy.text.Template
@@ -29,8 +32,7 @@ class HelpGenerator implements Constants {
         if (type == PluginType.GRADLE) {
             def slurper = new GradleDataSlurper(this.pluginFolder)
             return slurper
-        }
-        else {
+        } else {
             return new DataSlurper(this.pluginFolder)
         }
     }()
@@ -67,11 +69,9 @@ class HelpGenerator implements Constants {
             SimpleDateFormat format = new SimpleDateFormat("MMMMMMMMM dd, yyyy")
             return format.format(date)
 
-        }
-        else if (revisionDate == "-1") {
+        } else if (revisionDate == "-1") {
             return ""
-        }
-        else {
+        } else {
             return revisionDate
         }
     }()
@@ -87,7 +87,7 @@ class HelpGenerator implements Constants {
             toc = generateToc()
             releaseNotes = generateReleaseNotes()
             prerequisites = markdownToHtml(this.slurper.metadata.prerequisites)
-            chapters = processCustomChapters(this.slurper.metadata.chapters)
+            // chapters = processCustomChapters(this.slurper.metadata.chapters)
             metadata = this.slurper.metadata
             def configProcedure = getConfigurationProcedure()
             configurationProcedure = configProcedure ? grabProcedureParameters(configProcedure) : null
@@ -100,6 +100,7 @@ class HelpGenerator implements Constants {
             revisionDate = this.revisionDateFormat
             separateProceduresToc = this.slurper.metadata.separateProceduresToc
             supportedVersionsText = this.slurper.metadata.supportedVersionsText
+            chaptersPlacement = generateChaptersPlacement(this.slurper.metadata.chapters)
         }
 
         def template = getTemplate("page.html")
@@ -108,16 +109,22 @@ class HelpGenerator implements Constants {
         help
     }
 
-    def processCustomChapters(List<String> chapters) {
-        def retval = []
-        for(String content: chapters) {
-            def (header, text) = content.split(/\=+/)
-            assert header : "Chapter ${content.substring(0, 100)} does not have a header"
-            text = markdownToHtml(text)
-            header = header.replaceAll(/\n/, '')
-            retval << [header: header, text: text]
+    def generateChaptersPlacement(List<Map> chapters) {
+        List<Chapter> chapterList = chapters.collect {
+            Chapter ch = Chapter.loadChapter(this, new File(pluginFolder, "help"), it)
+            ch
         }
-        return retval
+        ChaptersPlacement placement = new ChaptersPlacement(chapters: chapterList, generator: this)
+        return placement
+        // def retval = []
+        // for(String content: chapters) {
+        //     def (header, text) = content.split(/\=+/)
+        //     assert header : "Chapter ${content.substring(0, 100)} does not have a header"
+        //     text = markdownToHtml(text)
+        //     header = header.replaceAll(/\n/, '')
+        //     retval << [header: header, text: text]
+        // }
+        // return retval
     }
 
     private Procedure grabProcedureParameters(Procedure proc) {
@@ -177,10 +184,9 @@ class HelpGenerator implements Constants {
             useCases = generateUseCases()
             knownIssues = this.slurper.metadata.knownIssues
             prerequisites = this.slurper.metadata.prerequisites
-            chapters = processCustomChapters(this.slurper.metadata.chapters)
+            chaptersPlacement = generateChaptersPlacement(this.slurper.metadata.chapters)
             separateProceduresToc = this.slurper.metadata.separateProceduresToc
             supportedVersions = this.slurper.metadata.supportedVersions
-
         }
 
         def template = getTemplate("toc.html")
@@ -195,7 +201,7 @@ class HelpGenerator implements Constants {
         }
         def groupedProcedures = []
         List<Procedure> commonProcedures = commonProcedures()
-        def groups = proceduresGrouping?.groups.collect {
+        def groups = proceduresGrouping?.groups?.collect {
             def description = it.description ?: ''
             def name = it.name ?: 'Other'
             groupedProcedures.addAll(it.procedures)
@@ -213,7 +219,7 @@ class HelpGenerator implements Constants {
         }
         if (ungroupedProcedures.size()) {
             def procedures = ungroupedProcedures.sort().collect { procedureName ->
-                commonProcedures.find { it.name == procedureName}
+                commonProcedures.find { it.name == procedureName }
             }
             def other = [name: 'Other', description: '', procedures: procedures]
             groups << other
@@ -241,7 +247,7 @@ class HelpGenerator implements Constants {
         return template
     }
 
-    private String markdownToHtml(String markdown) {
+    String markdownToHtml(String markdown) {
         if (markdown == null) {
             return null
         }
@@ -250,7 +256,7 @@ class HelpGenerator implements Constants {
     }
 
     private String cleanup(String help) {
-//        Empty lines of spaces
+        //        Empty lines of spaces
         help = help.replaceAll(/^\s+$/, '')
         help = help.replaceAll(/[“”]/, '"') // fucking quotes!!!!!
 
@@ -274,7 +280,7 @@ class HelpGenerator implements Constants {
 
     boolean isExcluded(String procedureName) {
         def excluded = this.slurper.metadata.excludeProcedures ?: []
-        return excluded.find{ it == procedureName }
+        return excluded.find { it == procedureName }
     }
 
     List<Procedure> commonProcedures() {
@@ -317,8 +323,8 @@ class HelpGenerator implements Constants {
         Map grouping = this.slurper.metadata.proceduresGrouping
         def order = []
         grouping?.groups?.each { group ->
-//            def name = group.name
-//            def description = group.description
+            //            def name = group.name
+            //            def description = group.description
             def procedures = group.procedures ?: []
             order += procedures
         }

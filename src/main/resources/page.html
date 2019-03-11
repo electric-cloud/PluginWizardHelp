@@ -19,8 +19,12 @@
     <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade"/>
     <h1>Contents</h1>
     ${toc}
+
+    ${chaptersPlacement.place('before', 'overview')}
     <h1>Overview</h1>
     <p>${overview}</p>
+    ${chaptersPlacement.place('after', 'overview')}
+    ${chaptersPlacement.place('before', 'supported_versions')}
     <% if (supportedVersions) { %>
     <h1 id="supportedVersions">Supported Versions</h1>
     <p>
@@ -35,21 +39,17 @@
         <% } %>
         </ul>
     </p>
+    ${chaptersPlacement.place('after', 'supported_versions')}
     <% } %>
+    ${chaptersPlacement.place('before', 'prerequisites')}
     <% if (prerequisites) { %>
     <div id="prerequisites">
         <h1>Prerequisites</h1>
         ${prerequisites}
     </div>
     <% } %>
+    ${chaptersPlacement.place('after', 'prerequisites')}
 
-    <% chapters.each { chapter -> %>
-    <div id="${chapter.header}">
-        <h1>${chapter.header}</h1>
-        ${chapter.text}
-    </div>
-
-    <% } %>
     <!--TODO custom blocks-->
 
     <% if (configurationProcedure) { %>
@@ -75,7 +75,7 @@
         <li>Find the @PLUGIN_NAME@ row.</li>
         <li>Click <b>Configure</b> to open the
              Configurations page.</li>
-        <li>Click <b>Create Configuration</b>.</li>
+        <li>Click <b>Create Configuration</b> as per the description of parameters below.</li>
         <% if (configurationProcedure.preface) { %>
         ${configurationProcedure.preface}
         <% } %>
@@ -101,6 +101,8 @@
         <% } %>
     </div>
     <% } %>
+
+    ${chaptersPlacement.place('before', 'procedures')}
 
     <h1 id="procedures">Plugin Procedures</h1>
     <% if (separateProceduresToc) {
@@ -158,6 +160,10 @@
 
     <% } %>
 
+    ${chaptersPlacement.place('after', 'procedures')}
+
+    ${chaptersPlacement.place('before', 'use_cases')}
+
     <% if (useCases) { %>
     <h1 id="usecases">Use Cases</h1>
 
@@ -167,12 +173,15 @@
     </div>
     <% } } %>
 
+    ${chaptersPlacement.place('after', 'use_cases')}
+    ${chaptersPlacement.place('before', 'known_issues')}
     <% if (knownIssues) { %>
     <h1 id="knownIssues">Known Issues</h1>
     <div>
         ${knownIssues}
     </div>
     <% } %>
+    ${chaptersPlacement.place('after', 'known_issues')}
 
     <h1 id="releaseNotes">Release Notes</h1>
     <% changelog.getOrderedVersions().each { version -> %>

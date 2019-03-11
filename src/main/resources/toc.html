@@ -1,20 +1,22 @@
 <ul>
+    ${chaptersPlacement.placeTocHeader('before', 'overview')}
     <li><a href="#overview">Overview</a></li>
+    ${chaptersPlacement.placeTocHeader('after', 'overview')}
+    ${chaptersPlacement.placeTocHeader('before', 'supported_versions')}
     <% if (supportedVersions) { %>
     <li><a href="#supportedVersions">Supported Versions</a></li>
     <%  } %>
+    ${chaptersPlacement.placeTocHeader('after', 'supported_versions')}
+    ${chaptersPlacement.placeTocHeader('before', 'prerequisites')}
     <% if (prerequisites) { %>
     <li><a href="#prerequisites">Prerequisites</a></li>
     <% } %>
-
-    <% chapters.each { chapter -> %>
-    <li><a href="#${chapter.header}">${chapter.header}</a></li>
-    <% } %>
-
+    ${chaptersPlacement.placeTocHeader('after', 'prerequisites')}
     <% if (hasConfig) { %>
     <li><a href="#CreateConfiguration">Plugin Configuration</a></li>
     <% } %>
 
+    ${chaptersPlacement.placeTocHeader('before', 'procedures')}
     <li><a href="#procedures">Plugin Procedures</a></li>
     <% if (proceduresGrouping) {
         proceduresGrouping.groups?.each { group ->
@@ -51,6 +53,9 @@
     </ul>
 
     <% } // common list %>
+
+    ${chaptersPlacement.placeTocHeader('after', 'procedures')}
+    ${chaptersPlacement.placeTocHeader('before', 'use_cases')}
     <% if (useCases) { %>
     <li><a href="#usecases">Use Cases</a></li>
     <ul>
@@ -59,8 +64,11 @@
         <% } %>
     </ul>
     <% } %>
+    ${chaptersPlacement.placeTocHeader('after', 'use_cases')}
+    ${chaptersPlacement.placeTocHeader('before', 'known_issues')}
     <% if (knownIssues) { %>
     <li><a href="#knownIssues">Known Issues</a></li>
     <% } %>
+    ${chaptersPlacement.placeTocHeader('after', 'known_issues')}
     <li><a href="#releaseNotes">Release Notes</a></li>
 </ul>

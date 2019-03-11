@@ -41,25 +41,8 @@ class DataSlurper {
             def metadata = HelpMetadata.fromYaml(helpFile)
             metadata = addMetaChapter(metadata, "overview")
             metadata = addMetaChapter(metadata, "prerequisites")
-            metadata = addChapters(metadata)
             return metadata
         }
-    }
-
-    def addChapters(HelpMetadata metadata) {
-        def order = []
-        new File(pluginFolder, "help").listFiles().each { File file ->
-            if (file.name.endsWith("Chapter.md")) {
-                logger.info("Found custom chapter ${file.name}")
-                order << file
-            }
-        }
-        order.sort {File a, File b ->
-            a.name <=> b.name
-        }.each {
-            metadata.addChapter(it.text)
-        }
-        return metadata
     }
 
     def addMetaChapter(HelpMetadata metadata, String name) {
