@@ -61,8 +61,9 @@ Full URL is added automatically to the images, to use image reference in Markdow
 ```
 Assuming that MyScreenshot.png is stored under htdocs/images folder.
 
-## Custom Chapters
+## Custom Chapters (Changed in 1.15)
 
+### Old
 Every .md document added into the help/ folder and having a name ending with "Chapter.md" is considered a custom chapter.
 The chapters are ordered by their file names and added after the "Overview" and "Prerequisites" chapters.
 Each chapter should have a header separated by ======, e.g.
@@ -70,6 +71,25 @@ Each chapter should have a header separated by ======, e.g.
     My Chapter
     ================
     Content
+
+### Current
+
+Additional chapters are described in metadata.yaml in the following format:
+
+    chapters:
+      - name: 'Chapter Name'
+        file: myChapter.md
+        place: before prerequisites
+
+Where file is the name of the file in the help/ folder. Place can be:
+
+
+* after|before supported_versions
+* after|before prerequisites
+* after|before overview
+* after|before procedures
+* after|before use_cases
+* after|before known_issues
 
 ## Configuration
 

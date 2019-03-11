@@ -35,7 +35,8 @@ class HelpMetadata {
     Map proceduresGrouping
 
 //    User-defined chapters (.md files in help)
-    List<String> chapters = new ArrayList<String>()
+//     List<String> chapters = new ArrayList<String>()
+    List<Map> chapters = []
 
 //    Plugin help will have two tables of contents: one main in the beginning of the file and one with the procedures list under Procedures header
     boolean separateProceduresToc
@@ -43,15 +44,10 @@ class HelpMetadata {
 //    description of the procedures will not be included into help
     boolean omitDescription
 
-
     static HelpMetadata fromYaml(File yaml) {
         def meta = new Yaml().load(new FileReader(yaml))
         HelpMetadata help = new HelpMetadata(meta)
         return help
     }
 
-
-    def addChapter(String content) {
-        chapters << content
-    }
 }
