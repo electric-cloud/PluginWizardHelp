@@ -88,10 +88,14 @@
             </tr>
             </thead>
             <tbody>
-            <% configurationProcedure.fields.each { field -> %>
+            <% for (def field in configurationProcedure.fields) { %>
             <tr>
-                <td <% if (field.required) print 'class="required"' %>>${field.name}</td>
-                <td>${field.documentation}</td>
+                <% if ("header" == field.type) { %>
+                    <td colspan="2" align="center"><strong>${field.name}</strong></td>
+                <% } else { %>
+                    <td <% if (field.required) print 'class="required"' %>>${field.name}</td>
+                    <td>${field.documentation}</td>
+                <% } %>
             </tr>
             <% } %>
             </tbody>
@@ -143,10 +147,14 @@
             </tr>
             </thead>
             <tbody>
-            <% procedure.fields.each { field -> %>
+            <% for (def field in procedure.fields) { %>
             <tr>
+                <% if ("header" == field.type) { %>
+                <td colspan="2" align="center"><strong>${field.name}</strong></td>
+                <% } else { %>
                 <td <% if (field.required) print 'class="required"' %>>${field.name}</td>
-                <td>${field.documentation}${field.additionalDocumentation ? '<br/>' + field.additionalDocumentation : ''}</td>
+                <td>${field.documentation}</td>
+                <% } %>
             </tr>
             <% } %>
             </tbody>

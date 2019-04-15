@@ -5,4 +5,5 @@ class Field {
     String documentation
     boolean required
     String additionalDocumentation
+    String type
 }

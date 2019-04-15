@@ -251,7 +251,8 @@ def procedure(name, closure) {
             new Field(
                 name: name,
                 required: required,
-                documentation: documentation
+                documentation: documentation,
+                type: element.type.toString(),
             )
         }
         fields
