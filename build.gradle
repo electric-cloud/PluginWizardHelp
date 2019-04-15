@@ -48,7 +48,7 @@ sourceSets {
 
 
 group = 'com.electriccloud'
-version = '1.15-SNAPSHOT'
+version = '1.16-SNAPSHOT'
 
 shadowJar {
     baseName = 'plugin-wizard-help'
@@ -68,7 +68,6 @@ githubRelease {
     owner = "electric-cloud"
     repo = "PluginWizardHelp"
     targetCommitish = "master"
-    draft = true // by default this is false
     def file = shadowJar.destinationDir.listFiles().find { it.name =~ /${shadowJar.baseName}-${version}/}
     releaseAssets = [file]
 }
