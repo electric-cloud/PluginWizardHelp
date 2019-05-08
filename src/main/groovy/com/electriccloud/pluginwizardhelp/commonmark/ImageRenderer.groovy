@@ -28,12 +28,11 @@ public class ImageRenderer implements NodeRenderer {
             destination = "../../plugins/@PLUGIN_KEY@/" + destination
         }
 
-        def imageAttrs = [:]
+        def imageAttrs = [src: destination]
+
         if (image.title) {
             imageAttrs['title'] = image.title
         }
-
-        imageAttrs['src'] = destination
 
         html.line()
         html.tag("img", imageAttrs, true)
