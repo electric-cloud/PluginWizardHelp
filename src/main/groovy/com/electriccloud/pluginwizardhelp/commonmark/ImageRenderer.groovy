@@ -1,13 +1,10 @@
-package com.electriccloud.pluginwizardhelp.commonmark;
+package com.electriccloud.pluginwizardhelp.commonmark
 
-import org.commonmark.node.Image;
-import org.commonmark.node.Node;
-import org.commonmark.renderer.NodeRenderer;
-import org.commonmark.renderer.html.HtmlNodeRendererContext;
-import org.commonmark.renderer.html.HtmlWriter;
-
-import java.util.Collections;
-import java.util.Set;
+import org.commonmark.node.Image
+import org.commonmark.node.Node
+import org.commonmark.renderer.NodeRenderer
+import org.commonmark.renderer.html.HtmlNodeRendererContext
+import org.commonmark.renderer.html.HtmlWriter
 
 public class ImageRenderer implements NodeRenderer {
     private final HtmlWriter html
@@ -25,14 +22,20 @@ public class ImageRenderer implements NodeRenderer {
     @Override
     public void render(Node node) {
         Image image = (Image) node
+
         String destination = image.getDestination().replaceAll(/'"&quot;/, '')
         if (destination.startsWith("images")) {
             destination = "../../plugins/@PLUGIN_KEY@/" + destination
         }
-//        TODO shrink
-        String title = image.title ?: ""
+
+        def imageAttrs = [src: destination]
+
+        if (image.title) {
+            imageAttrs['title'] = image.title
+        }
+
         html.line()
-        html.tag("image",[src: destination, title: title], true)
+        html.tag("img", imageAttrs, true)
         html.line()
     }
 
