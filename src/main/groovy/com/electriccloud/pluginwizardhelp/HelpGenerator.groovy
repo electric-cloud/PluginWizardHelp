@@ -9,6 +9,7 @@ import com.electriccloud.pluginwizardhelp.domain.ChaptersPlacement
 import com.electriccloud.pluginwizardhelp.domain.Procedure
 import groovy.text.SimpleTemplateEngine
 import groovy.text.Template
+import groovy.util.logging.Slf4j
 import org.commonmark.Extension
 import org.commonmark.ext.autolink.AutolinkExtension
 import org.commonmark.ext.gfm.tables.TablesExtension
@@ -116,15 +117,6 @@ class HelpGenerator implements Constants {
         }
         ChaptersPlacement placement = new ChaptersPlacement(chapters: chapterList, generator: this)
         return placement
-        // def retval = []
-        // for(String content: chapters) {
-        //     def (header, text) = content.split(/\=+/)
-        //     assert header : "Chapter ${content.substring(0, 100)} does not have a header"
-        //     text = markdownToHtml(text)
-        //     header = header.replaceAll(/\n/, '')
-        //     retval << [header: header, text: text]
-        // }
-        // return retval
     }
 
     private Procedure grabProcedureParameters(Procedure proc) {
@@ -200,15 +192,23 @@ class HelpGenerator implements Constants {
             return null
         }
         def groupedProcedures = []
+        def logger = Logger.getInstance()
         List<Procedure> commonProcedures = commonProcedures()
         def groups = proceduresGrouping?.groups?.collect {
             def description = it.description ?: ''
             def name = it.name ?: 'Other'
             groupedProcedures.addAll(it.procedures)
-            def procedures = it.procedures.collect { procedureName ->
+            def procedures = []
+            it.procedures.each { procedureName ->
                 Procedure proc = commonProcedures.find { it.name == procedureName }
-                proc
+                if (proc) {
+                    procedures << proc
+                }
+                else {
+                    logger.warning("Procedure $procedureName is not found in the list of procedures")
+                }
             }
+
             [name: name, description: description, procedures: procedures]
         }
         def ungroupedProcedures = []
@@ -218,8 +218,15 @@ class HelpGenerator implements Constants {
             }
         }
         if (ungroupedProcedures.size()) {
-            def procedures = ungroupedProcedures.sort().collect { procedureName ->
-                commonProcedures.find { it.name == procedureName }
+            def procedures = []
+            ungroupedProcedures.sort().each { procedureName ->
+                def proc = commonProcedures.find { it.name == procedureName }
+                if (proc) {
+                    procedures << proc
+                }
+                else {
+                    logger.warning("Procedure $procedureName does not exist in the list of procedures")
+                }
             }
             def other = [name: 'Other', description: '', procedures: procedures]
             groups << other
