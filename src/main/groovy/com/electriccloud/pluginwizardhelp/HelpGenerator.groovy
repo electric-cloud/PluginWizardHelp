@@ -205,7 +205,7 @@ class HelpGenerator implements Constants {
                     procedures << proc
                 }
                 else {
-                    logger.warning("Procedure $procedureName is not found in the list of procedures")
+                    throw new RuntimeException("Procedure $procedureName is not found in the list of procedures")
                 }
             }
 
@@ -225,7 +225,7 @@ class HelpGenerator implements Constants {
                     procedures << proc
                 }
                 else {
-                    logger.warning("Procedure $procedureName does not exist in the list of procedures")
+                    throw new RuntimeException("Procedure $procedureName is not found in the list of procedures")
                 }
             }
             def other = [name: 'Other', description: '', procedures: procedures]
