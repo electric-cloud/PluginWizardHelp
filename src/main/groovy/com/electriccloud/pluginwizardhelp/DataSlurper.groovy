@@ -213,7 +213,8 @@ class DataSlurper {
 
     Map readProcedureMetadataFromDsl(String procedureDsl, String procedureFolderName = "No procedure name passed"){
 
-        def dslCode = '''
+        def dslCode = """
+  this.pluginDir = '${this.pluginFolder}'
   this.collectedData = [:]
   
   def collect(String type, Map object){
@@ -251,13 +252,14 @@ class DataSlurper {
   }
   
   void step(Object... args) {}
+  void property(Object... args) {}
 
-'''
+"""
         def procedureMetadata = [:]
         try {
             procedureMetadata = Eval.me(dslCode + "\n" + procedureDsl + "\n return collectedData")
-            procedureMetadata.name = procedureMetadata['procedure']['name']
-            procedureMetadata.description = procedureMetadata['procedure']['description']
+            procedureMetadata.name = procedureMetadata['procedure'][0]['name']
+            procedureMetadata.description = procedureMetadata['procedure'][0]['description']
         } catch (Throwable e) {
             throw new SlurperException("Cannot eval procedure.dsl for the procedure '$procedureFolderName': ${e.getMessage()}")
         }
