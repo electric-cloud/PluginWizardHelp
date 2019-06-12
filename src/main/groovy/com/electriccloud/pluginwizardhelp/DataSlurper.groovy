@@ -251,9 +251,11 @@ class DataSlurper {
       collect('outputParameters', retval)
   }
   
-  void step(Object... args) {}
-  void property(Object... args) {}
-
+  def methodMissing(String name, Object args){
+      def retval = [:]
+      retval.name = args[0]
+      collect(name, retval)
+  }
 """
         def procedureMetadata = [:]
         try {
