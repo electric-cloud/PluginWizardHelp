@@ -3,7 +3,9 @@ import spock.lang.*
 
 @Unroll
 class DataSlurperTest extends Specification {
+
     DataSlurper slurper = new DataSlurper("some_folder")
+
     def "html documentation #formXml"() {
         when:
             def fields = slurper.readFields(formXml)
@@ -56,7 +58,39 @@ class DataSlurperTest extends Specification {
             assert fields[0].documentation == '<a href="link" target="_blank">link</a>'
     }
 
+    def "procedure metadata from dsl"() {
+        when:
+        def metadata = slurper.readProcedureMetadataFromDsl(procedureDsl, 'testProcedure')
 
+        then:
+        assert metadata.name
+        assert metadata.description
+
+        where:
+        procedureDsl << [getProcedureDslWithOutputParameters()]
+    }
+
+    def "procedure metadata from dsl with output parameters"() {
+        when:
+        def metadata = slurper.readProcedureMetadataFromDsl(procedureDsl, 'testProcedure')
+
+        then:
+        assert metadata.name
+        assert metadata.description
+        def outputParameters = metadata.outputParameters
+        assert outputParameters.size()
+
+        def parameter1 = outputParameters[0]
+        assert parameter1.name == 'outputParameter1'
+        assert parameter1.description == 'Description of the first outputParameter'
+
+        def parameter2 = outputParameters[1]
+        assert parameter2.name == 'outputParameter2'
+        assert parameter2.description == 'Description of the second outputParameter'
+
+        where:
+        procedureDsl << [getProcedureDslWithOutputParameters()]
+    }
 
     def getFormXmlWithDoc() {
         return '''
@@ -73,6 +107,25 @@ class DataSlurperTest extends Specification {
         <htmlDocumentation>Here goes some <a href="link">link</a></htmlDocumentation>
     </formElement>
 </editor>
+'''
+    }
+
+    def getProcedureDslWithOutputParameters(){
+        return '''
+procedure 'GetAllPlans', description: 'Returns all plans that are available for current user.', {
+
+    step 'GetAllPlans', {
+        description = ''
+        command = new File(pluginDir, "dsl/procedures/GetAllPlans/steps/GetAllPlans.pl").text
+        shell = 'ec-perl'
+    }
+
+    formalOutputParameter 'outputParameter1',
+        description: 'Description of the first outputParameter'
+        
+    formalOutputParameter 'outputParameter2',
+        description: 'Description of the second outputParameter'
+}
 '''
     }
 
