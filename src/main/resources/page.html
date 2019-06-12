@@ -159,6 +159,27 @@
             <% } %>
             </tbody>
         </table>
+
+        <% if (procedure.outputParameters != null) { %>
+        <h4>Output Parameters</h4>
+        <table class="grid">
+            <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% for (def param in procedure.outputParameters) { %>
+            <tr>
+                <td>${param.name}</td>
+                <td>${param.description}</td>
+            </tr>
+            <% } %>
+            </tbody>
+        </table>
+        <% } %>
+
         <% if (procedure.postface) { %>
         <p>
             ${procedure.postface}

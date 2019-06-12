@@ -205,7 +205,7 @@ class HelpGenerator implements Constants {
                     procedures << proc
                 }
                 else {
-                    throw new RuntimeException("Procedure $procedureName is not found in the list of procedures")
+                    throw new RuntimeException("Procedure $procedureName is not found in the list of procedures(in groups)")
                 }
             }
 
