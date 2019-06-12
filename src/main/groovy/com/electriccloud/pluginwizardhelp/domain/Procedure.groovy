@@ -11,6 +11,7 @@ class Procedure {
 //    Token to show after the procedure name in toc (e.g. "Cluster Only")
     String token
     Map additionalFieldsDoc
+    List<Object> outputParameters
     String procedure
     boolean deprecated
     boolean omitDescription

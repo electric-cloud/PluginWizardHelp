@@ -115,7 +115,8 @@ class DataSlurper {
         def procedure = new Procedure(
             name: procedureMetadata.name,
             description: procedureMetadata.description,
-            fields: fields
+            fields: fields,
+            outputParameters: procedureMetadata.outputParameters
         )
         procedure = withMetadata(procedure, procedureFolder)
         return procedure
@@ -196,27 +197,9 @@ class DataSlurper {
     }
 
     Map readProcedureMetadata(File procedureFolder) {
-        def dslCode = '''
-def procedure(params, name, closure) {
-    def retval = [:]
-    retval.name = name
-    retval.description = params.description
-    return retval
-}
 
-def procedure(name, closure) {
-    def retval = [:]
-    retval.name = name
-    retval.description = ''
-    return retval
-}
-'''
-        def procedureMetadata = [:]
-        try {
-            procedureMetadata = Eval.me(dslCode + "\n" + getProcedureDsl(procedureFolder))
-        } catch (Throwable e) {
-            throw new SlurperException("Cannot eval procedure.dsl for ${procedureFolder.name}: ${e.getMessage()}")
-        }
+        def procedureMetadata = readProcedureMetadataFromDsl(getProcedureDsl(procedureFolder), procedureFolder.name)
+
         if (!procedureMetadata.name) {
             logger.warning("Procedure in folder ${procedureFolder.name} does not have a name")
             throw new SlurperException("Procedure in folder ${procedureFolder.name} does not have a name")
@@ -225,6 +208,60 @@ def procedure(name, closure) {
             logger.warning("Procedure in ${procedureFolder.name} does not have a description")
             throw new SlurperException("Procedure in folder ${procedureFolder.name} does not have a description")
         }
+        procedureMetadata
+    }
+
+    Map readProcedureMetadataFromDsl(String procedureDsl, String procedureFolderName = "No procedure name passed"){
+
+        def dslCode = '''
+  this.collectedData = [:]
+  
+  def collect(String type, Map object){
+    if (this.collectedData[type] == null){
+      this.collectedData[type] = []
+    }
+    this.collectedData[type] << object
+  }
+  
+  def procedure(params, name, closure) {
+      def retval = [:]
+      retval.name = name
+      retval.description = params.description
+      
+      // *unexpected* : Collecting closure data in other methods 
+      closure.call()
+      collect('procedure', retval)
+  }
+  
+  def procedure(name, closure) {
+      def retval = [:]
+      retval.name = name
+      retval.description = ''
+      
+      // *unexpected* : Collecting closure data in other methods 
+      closure.call()
+      collect('procedure', retval)
+  }
+  
+  void formalOutputParameter(params, name) {
+      def retval = [:]
+      retval.name = name
+      retval.description = params.description
+      collect('outputParameters', retval)
+  }
+  
+  void step(Object... args) {}
+
+'''
+        def procedureMetadata = [:]
+        try {
+            procedureMetadata = Eval.me(dslCode + "\n" + procedureDsl + "\n return collectedData")
+            procedureMetadata.name = procedureMetadata['procedure']['name']
+            procedureMetadata.description = procedureMetadata['procedure']['description']
+        } catch (Throwable e) {
+            throw new SlurperException("Cannot eval procedure.dsl for the procedure '$procedureFolderName': ${e.getMessage()}")
+        }
+
         procedureMetadata
     }
 
