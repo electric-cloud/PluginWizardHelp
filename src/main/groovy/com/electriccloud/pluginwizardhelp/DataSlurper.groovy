@@ -52,8 +52,7 @@ class DataSlurper {
                 logger.warning("$name in metadata.yaml will be overriden by ${name}.md")
             }
             metadata.setProperty(name, chapter.text)
-        }
-        else {
+        } else {
             logger.warning("$name file does not exist. Consider placing it under ${chapter.absolutePath}.")
         }
         return metadata
@@ -77,10 +76,16 @@ class DataSlurper {
         proceduresFolder.eachFile { File folder ->
             logger.info("Reading procedure ${folder}")
             if (!folder.name.endsWith("_ignore")) {
-                Procedure procedure = readProcedure(folder)
-                if (procedure.name != 'EditConfiguration' && procedure.name != 'DeleteConfiguration')
-                    procedures << procedure
-                logger.info("Found procedure: ${procedure.name}")
+                Procedure procedure
+                try {
+                    procedure = readProcedure(folder)
+                    if (procedure.name != 'EditConfiguration' && procedure.name != 'DeleteConfiguration')
+                        procedures << procedure
+                    logger.info("Found procedure: ${procedure.name}")
+                }
+                catch (Throwable e) {
+                    logger.warning "Cannot read procedure from $folder: ${e.message}"
+                }
             }
         }
         return procedures
@@ -169,8 +174,7 @@ class DataSlurper {
         File file = new File(procedureFolder, "preface.md")
         if (file.exists()) {
             return file.text
-        }
-        else {
+        } else {
             return null
         }
     }
@@ -179,8 +183,7 @@ class DataSlurper {
         File file = new File(procedureFolder, "postface.md")
         if (file.exists()) {
             return file.text
-        }
-        else {
+        } else {
             return null
         }
     }
@@ -190,8 +193,7 @@ class DataSlurper {
         File file = new File(procedureFolder, "token.txt")
         if (file.exists()) {
             return file.text
-        }
-        else {
+        } else {
             return null
         }
     }
@@ -211,7 +213,7 @@ class DataSlurper {
         procedureMetadata
     }
 
-    Map readProcedureMetadataFromDsl(String procedureDsl, String procedureFolderName = "No procedure name passed"){
+    Map readProcedureMetadataFromDsl(String procedureDsl, String procedureFolderName = "No procedure name passed") {
 
         def dslCode = """
   this.pluginDir = '${this.pluginFolder}'
