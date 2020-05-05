@@ -33,7 +33,10 @@ class HelpGenerator implements Constants {
         if (type == PluginType.GRADLE) {
             def slurper = new GradleDataSlurper(this.pluginFolder)
             return slurper
-        } else {
+        } else if (type == PluginType.FLOWPDF)  {
+            return new FlowpdfSlurper(this.pluginFolder)
+        }
+        else {
             return new DataSlurper(this.pluginFolder)
         }
     }()
