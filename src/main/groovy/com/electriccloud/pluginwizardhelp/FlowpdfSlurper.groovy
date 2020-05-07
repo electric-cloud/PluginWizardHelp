@@ -79,6 +79,9 @@ class FlowpdfSlurper extends DataSlurper{
 
             List<Field> fields = proc?.parameters?.collect {
                 def documentation = it.htmlDocumentation ?: it.documentation
+                if (!documentation) {
+                    logger.warning("Documentation not found for $it.name: $proc.name")
+                }
                 boolean r = it.required instanceof Boolean ? it.required : it.required == "true" || it.required == '1'
                 new Field(
                     name: it.label ?: it.name,
@@ -95,6 +98,21 @@ class FlowpdfSlurper extends DataSlurper{
             def folder = new File(pluginFolder, "dsl/procedures/$folderName")
             procedure = withMetadata(procedure, folder)
             procedure
+        }
+
+
+        if (pluginspec.configuration) {
+            List<Field> configParams = pluginspec.configuration?.parameters?.collect {
+                def documentation = it.htmlDocumentation ?: it.documentation
+                boolean r = it.required instanceof Boolean ? it.required : it.required == "true" || it.required == '1'
+                new Field(
+                    name: it.label ?: it.name,
+                    required: r,
+                    documentation: documentation,
+                    type: it.type,
+                )
+            }
+            procedures << new Procedure(name: 'CreateConfiguration', description: '', fields: configParams)
         }
         return procedures
     }
