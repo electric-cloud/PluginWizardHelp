@@ -10,7 +10,7 @@ import groovy.util.slurpersupport.NodeChild
 import org.yaml.snakeyaml.Yaml
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml
 
-class FlowpdfSlurper extends DataSlurper{
+class FlowpdfSlurper extends DataSlurper {
     private static String HELP_FILE_PATH = "help/metadata.yaml"
     private static String HELP_FOLDER = 'help'
     private static String METADATA_GLOB = 'metadata.y*ml'
@@ -90,6 +90,13 @@ class FlowpdfSlurper extends DataSlurper{
                     type: it.type,
                 )
             }
+            if (proc.hasConfig) {
+                fields.add(0, new Field(
+                    name: 'Configuration Name',
+                    documentation: 'Previously defined configuration for the plugin',
+                    required: true
+                ))
+            }
             def outputParameters = proc.outputParameters?.collect {
                 [name: it.key, description: it.value]
             }
@@ -112,7 +119,29 @@ class FlowpdfSlurper extends DataSlurper{
                     type: it.type,
                 )
             }
-            procedures << new Procedure(name: 'CreateConfiguration', description: '', fields: configParams)
+            if (pluginspec.configuration.checkConnection) {
+                configParams << new Field(
+                    name: 'Check Connection?',
+                    required: false,
+                    documentation: 'If checked, the connection endpoint and credentials entered as part of the configuration will be tested. If this option is checked, configuration will not be saved if the test fails.'
+                )
+            }
+            if (pluginspec.configuration.hasDebugLevel) {
+                configParams << new Field(
+                    name: 'Debug Level',
+                    required: false,
+                    documentation: 'This option sets debug level for logs. If info is selected, only summary information will be shown, for debug, there will be some debug information and for trace the whole requests and responses will be shown.'
+                )
+            }
+
+            def configProcedure = new Procedure(name: 'CreateConfiguration', description: '', fields: configParams)
+
+            File configFolder = new File(pluginFolder, "dsl/procedures/CreateConfiguration")
+            if (configFolder.exists()) {
+                configProcedure = withMetadata(configProcedure, configFolder)
+            }
+
+            procedures << configProcedure
         }
         return procedures
     }
@@ -212,8 +241,6 @@ class FlowpdfSlurper extends DataSlurper{
     }
 
 
-
-
     File fileByGlob(File folder, String pattern) {
         def found = new FileNameFinder().getFileNames(folder.absolutePath, pattern)
         if (found.size() > 1) {
@@ -224,7 +251,6 @@ class FlowpdfSlurper extends DataSlurper{
         }
         return new File(found.first())
     }
-
 
 
 }
