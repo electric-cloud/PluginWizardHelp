@@ -43,6 +43,10 @@ class FlowpdfSlurper extends DataSlurper {
             def metadata = HelpMetadata.fromYaml(helpFile)
             metadata = addMetaChapter(metadata, "overview")
             metadata = addMetaChapter(metadata, "prerequisites")
+
+            File spec = new File(pluginFolder, SPEC_PATH)
+            def pluginspec = new Yaml().load(spec.text)
+            metadata.pluginKey = pluginspec.pluginInfo.pluginName
             return metadata
         }
     }

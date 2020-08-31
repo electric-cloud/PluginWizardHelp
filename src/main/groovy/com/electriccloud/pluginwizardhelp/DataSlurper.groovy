@@ -41,8 +41,18 @@ class DataSlurper {
             def metadata = HelpMetadata.fromYaml(helpFile)
             metadata = addMetaChapter(metadata, "overview")
             metadata = addMetaChapter(metadata, "prerequisites")
+
+            def metafile = new File(pluginFolder, "META-INF/plugin.xml")
+            if (metafile.exists()) {
+                def node = new XmlSlurper().parse(metafile)
+                def pluginKey = node.pluginKey
+                metadata.pluginKey = pluginKey
+            }
+
             return metadata
         }
+
+
     }
 
     def addMetaChapter(HelpMetadata metadata, String name) {

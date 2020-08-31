@@ -40,6 +40,13 @@ class Main {
         assert path
         Logger logger = Logger.buildInstance(options.v)
         def generator = new HelpGenerator(pluginFolder: path, revisionDate: revisionDate)
+
+        String adoc = generator.generateAdoc()
+        File out = new File(path, "help.adoc")
+        out.write(adoc)
+        logger.info "Saved adoc into $out.path"
+
+
         String help = generator.generate()
         new Validator().validate(help)
         File output = new File(outPath)

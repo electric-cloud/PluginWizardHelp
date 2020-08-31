@@ -44,6 +44,8 @@ class HelpMetadata {
 //    description of the procedures will not be included into help
     boolean omitDescription
 
+    String pluginKey
+
     static HelpMetadata fromYaml(File yaml) {
         def meta = new Yaml().load(new FileReader(yaml))
         HelpMetadata help = new HelpMetadata(meta)

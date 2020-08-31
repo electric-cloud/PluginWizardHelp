@@ -13,6 +13,7 @@ class Chapter {
     String content
     ChapterPlace place
     HelpGenerator generator
+    boolean adoc
 
     int headerLevel = 1
 
@@ -22,7 +23,8 @@ class Chapter {
 
     String render() {
         String content = generator.markdownToHtml(this.content)
-        return renderTemplate("chapter.html", [chapter: this, html: content])
+        def extension = adoc ? 'adoc' : 'html'
+        return renderTemplate("chapter.$extension", [chapter: this, html: content])
     }
 
     String renderToc() {
