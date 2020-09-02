@@ -138,7 +138,7 @@ ${knownIssues}
 ${chaptersPlacement.place('after', 'known_issues')}
 [[releasenotes]]
 <% changelog.getOrderedVersions().each { version -> %>
-=== @PLUGIN_KEY@ ${version.version}
+=== ${pluginKey} ${version.version}
 <% version.changes.each { change -> %>
 * ${change}
 <% } %>

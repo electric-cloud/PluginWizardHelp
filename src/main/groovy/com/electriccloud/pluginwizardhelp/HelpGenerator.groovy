@@ -106,6 +106,7 @@ class HelpGenerator implements Constants {
             separateProceduresToc = this.slurper.metadata.separateProceduresToc
             supportedVersionsText = this.slurper.metadata.supportedVersionsText
             chaptersPlacement = generateChaptersPlacement(this.slurper.metadata.chapters)
+            pluginKey = this.slurper.metadata.pluginKey
         }
 
         def template = getTemplate("page.adoc")

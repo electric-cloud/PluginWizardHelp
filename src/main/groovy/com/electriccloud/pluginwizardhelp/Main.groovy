@@ -42,7 +42,7 @@ class Main {
         def generator = new HelpGenerator(pluginFolder: path, revisionDate: revisionDate)
 
         String adoc = generator.generateAdoc()
-        File out = new File(path, "help.adoc")
+        File out = new File(path, "help/help.adoc")
         out.write(adoc)
         logger.info "Saved adoc into $out.path"
 
