@@ -34,6 +34,7 @@ dependencies {
     compile 'com.atlassian.commonmark:commonmark-ext-autolink:0.11.0'
     compile 'org.yaml:snakeyaml:1.17'
     compile 'nl.jworks.markdown_to_asciidoc:markdown_to_asciidoc:1.0'
+    compile 'org.asciidoctor:asciidoctorj:2.1.0'
     compile group: 'org.codehaus.groovy.modules.http-builder', name: 'http-builder', version: '0.7.1'
 
     testCompile group: 'org.spockframework', name:'spock-core', version:'1.2-groovy-2.5'

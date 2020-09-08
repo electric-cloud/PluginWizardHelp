@@ -11,6 +11,8 @@ import groovy.text.SimpleTemplateEngine
 import groovy.text.Template
 import groovy.util.logging.Slf4j
 import nl.jworks.markdown_to_asciidoc.Converter
+import org.asciidoctor.Asciidoctor
+import org.asciidoctor.OptionsBuilder
 import org.commonmark.Extension
 import org.commonmark.ext.autolink.AutolinkExtension
 import org.commonmark.ext.gfm.tables.TablesExtension
@@ -21,7 +23,7 @@ import org.commonmark.renderer.html.HtmlNodeRendererFactory
 import org.commonmark.renderer.html.HtmlRenderer
 import org.commonmark.node.*
 
-import java.text.SimpleDateFormat;
+import java.text.SimpleDateFormat
 
 class HelpGenerator implements Constants {
 
@@ -41,6 +43,7 @@ class HelpGenerator implements Constants {
             return new DataSlurper(this.pluginFolder)
         }
     }()
+
     @Lazy
     List<Extension> extensions = {
         Arrays.asList(TablesExtension.create(), AutolinkExtension.create())
@@ -159,6 +162,16 @@ class HelpGenerator implements Constants {
         def template = getTemplate("page.html")
         String help = template.make(parameters)
         help = cleanup(help)
+
+        //cloudbees-common::cd-plugins/ec-jira/createissues/form.png
+        help = help.replaceAll(/cloudbees-common::cd-plugins\/[\w-]+\/([\w\/\.-]+)/) {
+            def path = it[1]
+            return "../../plugins/@PLUGIN_NAME@/images/$path"
+                //<img src="../../plugins/@PLUGIN_NAME@/images/getissues/form.png" /><br/>
+        }
+
+        help = help.replaceAll(/<img(.+?)>/, '<img$1 />')
+
         help
     }
 
@@ -322,6 +335,7 @@ class HelpGenerator implements Constants {
         if (markdown == null) {
             return null
         }
+        //markdown is now adoc
         if (adoc) {
             return markdownToAdoc(markdown)
         }
