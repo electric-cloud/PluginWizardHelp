@@ -1,5 +1,3 @@
-// @PLUGIN_KEY@
-
 Plugin version @PLUGIN_VERSION@
 <% if (revisionDate) { %>
 Revised on ${revisionDate}
@@ -7,7 +5,13 @@ Revised on ${revisionDate}
 
 ${chaptersPlacement.place('before', 'overview')}
 
+<% if (overview) { %>
 == Overview
+
+${overview}
+
+<% } %>
+
 ${chaptersPlacement.place('after', 'overview')}
 ${chaptersPlacement.place('before', 'supported_versions')}
 <% if (supportedVersions) { %>
@@ -77,7 +81,7 @@ ${proceduresPreface}
 
 <% procedures.each { procedure -> %>
 [[${procedure.id}]]
-== ${procedure.name}${procedure.deprecated ? ' (DEPRECATED)' : ''}
+=== ${procedure.name}${procedure.deprecated ? ' (DEPRECATED)' : ''}
 <% if (procedure.token) { %>
 ${procedure.token}
 <% } %>
@@ -87,12 +91,13 @@ ${procedure.description}
 <% if (procedure.preface) { %>
 ${procedure.preface}
 <% } %>
-=== ${procedure.name} Parameters
+
+==== ${procedure.name} Parameters
 [cols=",",options="header",]
 |===
 | Parameter | Description
 <% for (def field in procedure.fields) { %>
-| ${field.name} | ${field.documentation}
+| ${field.name} | ${field.documentation.replaceAll(/[|]/, "\\\\|")}
 <% } %>
 |===
 
@@ -104,7 +109,7 @@ ${procedure.preface}
 |===
 | Parameter | Description
 <% for (def param in procedure.outputParameters) { %>
-| ${param.name} | ${param.description}
+| ${param.name} | ${param.description.replaceAll(/\|/, "\\|")}
 <% } %>
 |===
 <% } %>
@@ -136,10 +141,13 @@ ${chaptersPlacement.place('before', 'known_issues')}
 ${knownIssues}
 <% } %>
 ${chaptersPlacement.place('after', 'known_issues')}
-[[releasenotes]]
+
+[[rns]]
+== Release notes
+
 <% changelog.getOrderedVersions().each { version -> %>
 === ${pluginKey} ${version.version}
 <% version.changes.each { change -> %>
-* ${change}
+- ${change}
 <% } %>
 <% } %>

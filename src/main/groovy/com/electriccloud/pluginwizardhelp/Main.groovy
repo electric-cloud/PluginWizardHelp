@@ -47,11 +47,11 @@ class Main {
         logger.info "Saved adoc into $out.path"
 
 
-        String help = generator.generate()
-        new Validator().validate(help)
-        File output = new File(outPath)
-        output.write help
-        logger.info("Saved content into ${outPath}")
+        //String help = generator.generate()
+        //new Validator().validate(help)
+        //File output = new File(outPath)
+        //output.write help
+        //logger.info("Saved content into ${outPath}")
     }
 
 

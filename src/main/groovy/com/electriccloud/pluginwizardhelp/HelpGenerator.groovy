@@ -3,6 +3,7 @@ package com.electriccloud.pluginwizardhelp
 import com.electriccloud.pluginwizardhelp.commonmark.HeaderVisitor
 import com.electriccloud.pluginwizardhelp.commonmark.ImageRenderer
 import com.electriccloud.pluginwizardhelp.commonmark.LinkRenderer
+import com.electriccloud.pluginwizardhelp.domain.Changelog
 import com.electriccloud.pluginwizardhelp.domain.Chapter
 import com.electriccloud.pluginwizardhelp.domain.ChapterPlace
 import com.electriccloud.pluginwizardhelp.domain.ChaptersPlacement
@@ -10,6 +11,7 @@ import com.electriccloud.pluginwizardhelp.domain.Procedure
 import groovy.text.SimpleTemplateEngine
 import groovy.text.Template
 import groovy.util.logging.Slf4j
+import groovy.util.slurpersupport.NodeChild
 import nl.jworks.markdown_to_asciidoc.Converter
 import org.asciidoctor.Asciidoctor
 import org.asciidoctor.OptionsBuilder
@@ -22,6 +24,7 @@ import org.commonmark.renderer.html.HtmlNodeRendererContext
 import org.commonmark.renderer.html.HtmlNodeRendererFactory
 import org.commonmark.renderer.html.HtmlRenderer
 import org.commonmark.node.*
+import org.cyberneko.html.parsers.SAXParser
 
 import java.text.SimpleDateFormat
 
@@ -86,6 +89,14 @@ class HelpGenerator implements Constants {
 
     Logger logger = Logger.getInstance()
 
+
+    Changelog changelogToAdoc(Changelog changelog) {
+        for (def v in changelog.versions) {
+            v.changes = v.changes.collect {it }
+        }
+        return changelog
+    }
+
     String generateAdoc() {
         adoc = true
         def parameters = [:]
@@ -102,7 +113,7 @@ class HelpGenerator implements Constants {
             proceduresPreface = markdownToAdoc(this.slurper.metadata.proceduresPreface)
             overview = markdownToAdoc(this.slurper.metadata.overview)
             supportedVersions = this.slurper.metadata.supportedVersions
-            changelog = this.slurper.changelog
+            changelog = changelogToAdoc(this.slurper.changelog)
             useCases = this.generateUseCases()
             knownIssues = markdownToAdoc(this.slurper.metadata.knownIssues)
             revisionDate = this.revisionDateFormat
@@ -125,10 +136,14 @@ class HelpGenerator implements Constants {
         if (!md) {
             md = ''
         }
-        String retval =  Converter.convertMarkdownToAsciiDoc(md)
+        String retval = Converter.convertMarkdownToAsciiDoc(md)
         def pluginKeyLowercase = this.slurper.metadata.pluginKey.toLowerCase()
-        retval = retval.replaceAll(/image:images\/([\w\/.]+?)\[(.+?)\]/) {
-            def imagePath = it[1]
+        retval = retval.replaceAll(/image:images\/([\w\/\-.]+?)\[(.+?)\]/) {
+            String imagePath = it[1]
+            if (imagePath =~ /[A-Z]/) {
+                logger.warning("The path $imagePath contains invalid symbols")
+            }
+            imagePath = imagePath.toLowerCase()
             "image::cloudbees-common::cd-plugins/$pluginKeyLowercase/$imagePath[image]"
         }
         return retval
@@ -165,9 +180,9 @@ class HelpGenerator implements Constants {
 
         //cloudbees-common::cd-plugins/ec-jira/createissues/form.png
         help = help.replaceAll(/cloudbees-common::cd-plugins\/[\w-]+\/([\w\/\.-]+)/) {
-            def path = it[1]
+            String path = it[1]
             return "../../plugins/@PLUGIN_NAME@/images/$path"
-                //<img src="../../plugins/@PLUGIN_NAME@/images/getissues/form.png" /><br/>
+            //<img src="../../plugins/@PLUGIN_NAME@/images/getissues/form.png" /><br/>
         }
 
         help = help.replaceAll(/<img(.+?)>/, '<img$1 />')
@@ -201,7 +216,11 @@ class HelpGenerator implements Constants {
         if (proc.description) {
             String description = proc.description
             if (description =~ /html/) {
-                description = description.replaceAll(/<\/?html>/, '')
+                if (adoc) {
+                    description = htmlToAdoc(description)
+                } else {
+                    description = description.replaceAll(/<\/?html>/, '')
+                }
             }
             if (isPlainText(description)) {
                 if (!adoc)
@@ -217,9 +236,63 @@ class HelpGenerator implements Constants {
         if (!s) {
             s = ''
         }
-        s = s.replaceAll(/<br\s*\/>/, "\n")
-        .replaceAll(/<b>|<\/b>/, '*')
-        return s
+        SAXParser parser = new SAXParser()
+        StringWriter sw = new StringWriter()
+        def wrapped = "<root>$s</root>"
+
+
+        Closure walkNode
+        int listLevel = 0
+        String listBullet = ""
+        walkNode = { n ->
+            for (def child in n.children()) {
+                if (child instanceof groovy.util.slurpersupport.Node) {
+                    if (child.name() == "BR") {
+                        sw.println("\n\n")
+                    } else if (child.name() == "A") {
+                        //todo escape
+                        def href = child.attributes().getOrDefault("href", "")
+                        sw.print(" $href[${child.text()}] ")
+                    } else if (child.name() == "B") {
+                        sw.print(" *${child.text()}* ")
+                    } else if (child.name() == "I") {
+                        sw.print "_${child.text()}_"
+                    } else if (child.name() == "OL" || child.name() == "UL") {
+                        listLevel++
+                        //sw.print("\n${'*' * listLevel}")
+                        if (child.name() == "OL") {
+                            listBullet = "."
+                        } else {
+                            listBullet = "*"
+                        }
+                        walkNode(child)
+
+                        listLevel--
+                    } else if (child.name() == "LI") {
+                        sw.print "\n ${listBullet * listLevel} "
+                        walkNode(child)
+                    } else {
+                        walkNode(child)
+                    }
+                } else {
+                    sw.println(child)
+                }
+            }
+        }
+
+        new XmlSlurper(parser).parseText(s).childNodes().each { target ->
+            walkNode(target)
+            //for (def child in target.children()) {
+            //    if (child instanceof groovy.util.slurpersupport.Node) {
+            //        walkNode(child)
+            //    }
+            //    else {
+            //        sw.println(child)
+            //    }
+            //}
+        }
+
+        return sw.toString()
     }
 
     boolean isPlainText(String text) {

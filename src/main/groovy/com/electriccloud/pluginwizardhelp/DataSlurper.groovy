@@ -45,8 +45,11 @@ class DataSlurper {
             def metafile = new File(pluginFolder, "META-INF/plugin.xml")
             if (metafile.exists()) {
                 def node = new XmlSlurper().parse(metafile)
-                def pluginKey = node.pluginKey
+                def pluginKey = node.key
                 metadata.pluginKey = pluginKey
+            }
+            else {
+                metadata.pluginKey = new File(pluginFolder).name
             }
 
             return metadata
