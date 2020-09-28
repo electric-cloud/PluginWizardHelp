@@ -43,6 +43,10 @@ class FlowpdfSlurper extends DataSlurper {
             def metadata = HelpMetadata.fromYaml(helpFile)
             metadata = addMetaChapter(metadata, "overview")
             metadata = addMetaChapter(metadata, "prerequisites")
+
+            File spec = new File(pluginFolder, SPEC_PATH)
+            def pluginspec = new Yaml().load(spec.text)
+            metadata.pluginKey = pluginspec.pluginInfo.pluginName
             return metadata
         }
     }
@@ -75,7 +79,12 @@ class FlowpdfSlurper extends DataSlurper {
         File spec = new File(pluginFolder, SPEC_PATH)
         def pluginspec = new Yaml().load(spec.text)
 
-        List<Procedure> procedures = pluginspec?.procedures?.collect { proc ->
+        List<Procedure> procedures = []
+        pluginspec?.procedures?.each { proc ->
+
+            if (proc.hideFromStepPicker) {
+                return
+            }
 
             List<Field> fields = proc?.parameters?.collect {
                 def documentation = it.htmlDocumentation ?: it.documentation
@@ -104,7 +113,7 @@ class FlowpdfSlurper extends DataSlurper {
             def folderName = procedure.name.replaceAll(/\W/, '')
             def folder = new File(pluginFolder, "dsl/procedures/$folderName")
             procedure = withMetadata(procedure, folder)
-            procedure
+            procedures << procedure
         }
 
 
@@ -118,7 +127,66 @@ class FlowpdfSlurper extends DataSlurper {
                     documentation: documentation,
                     type: it.type,
                 )
+            } ?: []
+
+
+            /*
+            configuration:
+  checkConnection: true
+  restConfigInfo:
+    defaultEndpointValue: 'https://api.github.com'
+    checkConnectionUri: '/user'
+    headers:
+      Accept: '*'
+    endpointDescription: 'Endpoint to connect to. By default Github API endpoint.'
+    authSchemes:
+      basic:
+        userNameLabel: Username to connect to Github
+        passwordLabel: Password to connect to Github
+      bearer:
+        passwordLabel: Bearer token to connect to Github API.
+  hasDebugLevel: true
+             */
+
+            if (pluginspec.configuration.restConfigInfo) {
+                def rest = pluginspec.configuration.restConfigInfo
+                def endpointLabel = rest.endpointLabel ?: 'REST API Endpoint'
+                configParams << new Field(
+                    name: 'Configuration Name',
+                    required: true,
+                    documentation: 'Unique name for the configuration',
+                    type: 'entry'
+                )
+                configParams << new Field(
+                    name: 'Description',
+                    required: false,
+                    documentation: 'Configuration description',
+                    type: 'entry'
+                )
+                configParams <<  new Field(
+                    name: endpointLabel,
+                    required: true,
+                    documentation: rest.endpointDescription,
+                    type: 'entry',
+                )
+                configParams << new Field(
+                    name: 'Auth Scheme',
+                    documentation: 'Authorization scheme for the third-party connection.',
+                    type: 'entry',
+                    required: true
+                )
+
+                //todo auth schemes
+                if (rest.hasDebugLevel == 'true') {
+                    configParams << new Field(
+                        name: "Debug Level",
+                        documentation: 'This option sets debug level for logs. If info is selected, only summary information will be shown, for debug, there will be some debug information and for trace the whole requests and responses will be shown.',
+                        type: 'entry',
+                        required: false
+                    )
+                }
             }
+
             if (pluginspec.configuration.checkConnection) {
                 configParams << new Field(
                     name: 'Check Connection?',

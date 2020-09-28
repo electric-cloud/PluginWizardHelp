@@ -3,6 +3,7 @@ package com.electriccloud.pluginwizardhelp
 import com.electriccloud.pluginwizardhelp.commonmark.HeaderVisitor
 import com.electriccloud.pluginwizardhelp.commonmark.ImageRenderer
 import com.electriccloud.pluginwizardhelp.commonmark.LinkRenderer
+import com.electriccloud.pluginwizardhelp.domain.Changelog
 import com.electriccloud.pluginwizardhelp.domain.Chapter
 import com.electriccloud.pluginwizardhelp.domain.ChapterPlace
 import com.electriccloud.pluginwizardhelp.domain.ChaptersPlacement
@@ -10,6 +11,10 @@ import com.electriccloud.pluginwizardhelp.domain.Procedure
 import groovy.text.SimpleTemplateEngine
 import groovy.text.Template
 import groovy.util.logging.Slf4j
+import groovy.util.slurpersupport.NodeChild
+import nl.jworks.markdown_to_asciidoc.Converter
+import org.asciidoctor.Asciidoctor
+import org.asciidoctor.OptionsBuilder
 import org.commonmark.Extension
 import org.commonmark.ext.autolink.AutolinkExtension
 import org.commonmark.ext.gfm.tables.TablesExtension
@@ -19,13 +24,15 @@ import org.commonmark.renderer.html.HtmlNodeRendererContext
 import org.commonmark.renderer.html.HtmlNodeRendererFactory
 import org.commonmark.renderer.html.HtmlRenderer
 import org.commonmark.node.*
+import org.cyberneko.html.parsers.SAXParser
 
-import java.text.SimpleDateFormat;
+import java.text.SimpleDateFormat
 
 class HelpGenerator implements Constants {
 
     String pluginFolder
     String revisionDate
+    boolean adoc
 
     @Lazy(soft = true)
     DataSlurper slurper = {
@@ -33,13 +40,13 @@ class HelpGenerator implements Constants {
         if (type == PluginType.GRADLE) {
             def slurper = new GradleDataSlurper(this.pluginFolder)
             return slurper
-        } else if (type == PluginType.FLOWPDF)  {
+        } else if (type == PluginType.FLOWPDF) {
             return new FlowpdfSlurper(this.pluginFolder)
-        }
-        else {
+        } else {
             return new DataSlurper(this.pluginFolder)
         }
     }()
+
     @Lazy
     List<Extension> extensions = {
         Arrays.asList(TablesExtension.create(), AutolinkExtension.create())
@@ -54,15 +61,15 @@ class HelpGenerator implements Constants {
             .builder()
             .extensions(extensions)
             .nodeRendererFactory(new HtmlNodeRendererFactory() {
-            public NodeRenderer create(HtmlNodeRendererContext context) {
-                return new ImageRenderer(context)
-            }
-        })
+                public NodeRenderer create(HtmlNodeRendererContext context) {
+                    return new ImageRenderer(context)
+                }
+            })
             .nodeRendererFactory(new HtmlNodeRendererFactory() {
-            public NodeRenderer create(HtmlNodeRendererContext context) {
-                return new LinkRenderer(context)
-            }
-        })
+                public NodeRenderer create(HtmlNodeRendererContext context) {
+                    return new LinkRenderer(context)
+                }
+            })
             .build()
     }()
 
@@ -81,6 +88,66 @@ class HelpGenerator implements Constants {
     }()
 
     Logger logger = Logger.getInstance()
+
+
+    Changelog changelogToAdoc(Changelog changelog) {
+        for (def v in changelog.versions) {
+            v.changes = v.changes.collect {it }
+        }
+        return changelog
+    }
+
+    String generateAdoc() {
+        adoc = true
+        def parameters = [:]
+        parameters.with {
+            procedures = this.commonProcedures().collect { Procedure proc ->
+                grabProcedureParameters(proc)
+            }
+            releaseNotes = generateReleaseNotes()
+            prerequisites = markdownToAdoc(this.slurper.metadata.prerequisites)
+            // chapters = processCustomChapters(this.slurper.metadata.chapters)
+            metadata = this.slurper.metadata
+            def configProcedure = getConfigurationProcedure()
+            configurationProcedure = configProcedure ? grabProcedureParameters(configProcedure) : null
+            proceduresPreface = markdownToAdoc(this.slurper.metadata.proceduresPreface)
+            overview = markdownToAdoc(this.slurper.metadata.overview)
+            supportedVersions = this.slurper.metadata.supportedVersions
+            changelog = changelogToAdoc(this.slurper.changelog)
+            useCases = this.generateUseCases()
+            knownIssues = markdownToAdoc(this.slurper.metadata.knownIssues)
+            revisionDate = this.revisionDateFormat
+            separateProceduresToc = this.slurper.metadata.separateProceduresToc
+            supportedVersionsText = this.slurper.metadata.supportedVersionsText
+            chaptersPlacement = generateChaptersPlacement(this.slurper.metadata.chapters)
+            pluginKey = this.slurper.metadata.pluginKey
+        }
+
+        def template = getTemplate("page.adoc")
+        String help = template.make(parameters)
+        help = help.replaceAll(/(?i)CloudBees CD/, '{CD}')
+        help = cleanup(help)
+
+        adoc = false
+        help
+    }
+
+    String markdownToAdoc(String md) {
+        if (!md) {
+            md = ''
+        }
+        String retval = Converter.convertMarkdownToAsciiDoc(md)
+        def pluginKeyLowercase = this.slurper.metadata.pluginKey.toLowerCase()
+        retval = retval.replaceAll(/image:images\/([\w\/\-.]+?)\[(.+?)\]/) {
+            String imagePath = it[1]
+            if (imagePath =~ /[A-Z]/) {
+                logger.warning("The path $imagePath contains invalid symbols")
+            }
+            imagePath = imagePath.toLowerCase()
+            "image::cloudbees-common::cd-plugins/$pluginKeyLowercase/$imagePath[image]"
+        }
+        return retval
+    }
 
     String generate() {
         def parameters = [:]
@@ -110,12 +177,23 @@ class HelpGenerator implements Constants {
         def template = getTemplate("page.html")
         String help = template.make(parameters)
         help = cleanup(help)
+
+        //cloudbees-common::cd-plugins/ec-jira/createissues/form.png
+        help = help.replaceAll(/cloudbees-common::cd-plugins\/[\w-]+\/([\w\/\.-]+)/) {
+            String path = it[1]
+            return "../../plugins/@PLUGIN_NAME@/images/$path"
+            //<img src="../../plugins/@PLUGIN_NAME@/images/getissues/form.png" /><br/>
+        }
+
+        help = help.replaceAll(/<img(.+?)>/, '<img$1 />')
+
         help
     }
 
     def generateChaptersPlacement(List<Map> chapters) {
         List<Chapter> chapterList = chapters.collect {
             Chapter ch = Chapter.loadChapter(this, new File(pluginFolder, "help"), it)
+            ch.adoc = this.adoc
             ch
         }
         ChaptersPlacement placement = new ChaptersPlacement(chapters: chapterList, generator: this)
@@ -131,20 +209,91 @@ class HelpGenerator implements Constants {
         }
         proc.fields.each { field ->
             field.additionalDocumentation = markdownToHtml(field.additionalDocumentation)
+            if (adoc) {
+                field.documentation = htmlToAdoc field.documentation
+            }
         }
         if (proc.description) {
             String description = proc.description
             if (description =~ /html/) {
-                description = description.replaceAll(/<\/?html>/, '')
+                if (adoc) {
+                    description = htmlToAdoc(description)
+                } else {
+                    description = description.replaceAll(/<\/?html>/, '')
+                }
             }
             if (isPlainText(description)) {
-                description = "<p>$description</p>".toString()
+                if (!adoc)
+                    description = "<p>$description</p>".toString()
             }
             proc.description = description
         }
         proc
     }
 
+
+    static htmlToAdoc(String s) {
+        if (!s) {
+            s = ''
+        }
+        SAXParser parser = new SAXParser()
+        StringWriter sw = new StringWriter()
+        def wrapped = "<root>$s</root>"
+
+
+        Closure walkNode
+        int listLevel = 0
+        String listBullet = ""
+        walkNode = { n ->
+            for (def child in n.children()) {
+                if (child instanceof groovy.util.slurpersupport.Node) {
+                    if (child.name() == "BR") {
+                        sw.println("\n\n")
+                    } else if (child.name() == "A") {
+                        //todo escape
+                        def href = child.attributes().getOrDefault("href", "")
+                        sw.print(" $href[${child.text()}] ")
+                    } else if (child.name() == "B") {
+                        sw.print(" *${child.text()}* ")
+                    } else if (child.name() == "I") {
+                        sw.print "_${child.text()}_"
+                    } else if (child.name() == "OL" || child.name() == "UL") {
+                        listLevel++
+                        //sw.print("\n${'*' * listLevel}")
+                        if (child.name() == "OL") {
+                            listBullet = "."
+                        } else {
+                            listBullet = "*"
+                        }
+                        walkNode(child)
+
+                        listLevel--
+                    } else if (child.name() == "LI") {
+                        sw.print "\n ${listBullet * listLevel} "
+                        walkNode(child)
+                    } else {
+                        walkNode(child)
+                    }
+                } else {
+                    sw.println(child)
+                }
+            }
+        }
+
+        new XmlSlurper(parser).parseText(s).childNodes().each { target ->
+            walkNode(target)
+            //for (def child in target.children()) {
+            //    if (child instanceof groovy.util.slurpersupport.Node) {
+            //        walkNode(child)
+            //    }
+            //    else {
+            //        sw.println(child)
+            //    }
+            //}
+        }
+
+        return sw.toString()
+    }
 
     boolean isPlainText(String text) {
         if (text =~ /<|\/>/) {
@@ -206,8 +355,7 @@ class HelpGenerator implements Constants {
                 Procedure proc = commonProcedures.find { it.name == procedureName }
                 if (proc) {
                     procedures << proc
-                }
-                else {
+                } else {
                     throw new RuntimeException("Procedure $procedureName is not found in the list of procedures(in groups)")
                 }
             }
@@ -226,8 +374,7 @@ class HelpGenerator implements Constants {
                 def proc = commonProcedures.find { it.name == procedureName }
                 if (proc) {
                     procedures << proc
-                }
-                else {
+                } else {
                     throw new RuntimeException("Procedure $procedureName is not found in the list of procedures")
                 }
             }
@@ -260,6 +407,10 @@ class HelpGenerator implements Constants {
     String markdownToHtml(String markdown) {
         if (markdown == null) {
             return null
+        }
+        //markdown is now adoc
+        if (adoc) {
+            return markdownToAdoc(markdown)
         }
         Node document = markdownParser.parse(markdown)
         return htmlRenderer.render(document)

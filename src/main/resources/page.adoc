@@ -1,0 +1,153 @@
+Plugin version @PLUGIN_VERSION@
+<% if (revisionDate) { %>
+Revised on ${revisionDate}
+<% } %>
+
+${chaptersPlacement.place('before', 'overview')}
+
+<% if (overview) { %>
+== Overview
+
+${overview}
+
+<% } %>
+
+${chaptersPlacement.place('after', 'overview')}
+${chaptersPlacement.place('before', 'supported_versions')}
+<% if (supportedVersions) { %>
+== Supported Versions
+<% if (supportedVersionsText) { %>
+$supportedVersionsText
+<% } else { %>
+The plugin has been tested with the following versions:
+<% } %>
+<% supportedVersions.each { version -> %>
+* ${version}
+<% } %>
+
+${chaptersPlacement.place('after', 'supported_versions')}
+<% } %>
+${chaptersPlacement.place('before', 'prerequisites')}
+<% if (prerequisites) { %>
+== Prerequisites
+${prerequisites}
+<% } %>
+${chaptersPlacement.place('after', 'prerequisites')}
+<% if (configurationProcedure) { %>
+
+== Plugin Configurations
+Plugin configurations are sets of parameters that apply
+across some or all of the plugin procedures. They
+reduce repetition of common values, create
+predefined parameter sets for end users, and
+securely store credentials where needed. Each configuration
+is given a unique name that is entered in designated
+parameters on procedures that use them.
+
+
+=== Creating Plugin Configurations
+To create plugin configurations in {CD}, do these steps:
+
+* Go to **Administration** &gt;**Plugins** to open the Plugin Manager.
+* Find the @PLUGIN_NAME@ row.
+* Click *Configure* to open the
+     Configurations page.
+* Click *Create Configuration* as per the description of parameters below.
+
+<% if (configurationProcedure.preface) { %>
+${configurationProcedure.preface}
+<% } %>
+
+=== Configuration Procedure Parameters
+[cols=",",options="header",]
+|===
+|Parameter |Description
+<% for (def field in configurationProcedure.fields) { %>
+|${field.name} | ${field.documentation}
+<% } %>
+|===
+<% if (configurationProcedure.postface) { %>
+${configurationProcedure.postface}
+<% } %>
+<% } %>
+
+${chaptersPlacement.place('before', 'procedures')}
+
+[[procedures]]
+== Plugin Procedures
+<% if (proceduresPreface) { %>
+${proceduresPreface}
+<% } %>
+
+<% procedures.each { procedure -> %>
+[[${procedure.id}]]
+=== ${procedure.name}${procedure.deprecated ? ' (DEPRECATED)' : ''}
+<% if (procedure.token) { %>
+${procedure.token}
+<% } %>
+<% if (!procedure.omitDescription && !metadata.omitDescription) { %>
+${procedure.description}
+<% } %>
+<% if (procedure.preface) { %>
+${procedure.preface}
+<% } %>
+
+==== ${procedure.name} Parameters
+[cols=",",options="header",]
+|===
+| Parameter | Description
+<% for (def field in procedure.fields) { %>
+| ${field.name} | ${field.documentation.replaceAll(/[|]/, "\\\\|")}
+<% } %>
+|===
+
+<% if (procedure.outputParameters != null) { %>
+
+==== Output Parameters
+
+[cols=",",options="header",]
+|===
+| Parameter | Description
+<% for (def param in procedure.outputParameters) { %>
+| ${param.name} | ${param.description.replaceAll(/\|/, "\\|")}
+<% } %>
+|===
+<% } %>
+
+<% if (procedure.postface) { %>
+${procedure.postface}
+<% } %>
+
+<% } %>
+
+${chaptersPlacement.place('after', 'procedures')}
+
+${chaptersPlacement.place('before', 'use_cases')}
+
+<% if (useCases) { %>
+
+== Use Cases
+
+<% useCases.each { useCase -> %>
+[[${useCase.id}]]
+${useCase.body}
+<% } } %>
+
+${chaptersPlacement.place('after', 'use_cases')}
+${chaptersPlacement.place('before', 'known_issues')}
+<% if (knownIssues) { %>
+
+== Known Issues
+${knownIssues}
+<% } %>
+${chaptersPlacement.place('after', 'known_issues')}
+
+[[rns]]
+== Release notes
+
+<% changelog.getOrderedVersions().each { version -> %>
+=== ${pluginKey} ${version.version}
+<% version.changes.each { change -> %>
+- ${change}
+<% } %>
+<% } %>

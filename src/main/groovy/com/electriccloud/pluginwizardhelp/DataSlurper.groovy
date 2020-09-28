@@ -41,8 +41,21 @@ class DataSlurper {
             def metadata = HelpMetadata.fromYaml(helpFile)
             metadata = addMetaChapter(metadata, "overview")
             metadata = addMetaChapter(metadata, "prerequisites")
+
+            def metafile = new File(pluginFolder, "META-INF/plugin.xml")
+            if (metafile.exists()) {
+                def node = new XmlSlurper().parse(metafile)
+                def pluginKey = node.key
+                metadata.pluginKey = pluginKey
+            }
+            else {
+                metadata.pluginKey = new File(pluginFolder).name
+            }
+
             return metadata
         }
+
+
     }
 
     def addMetaChapter(HelpMetadata metadata, String name) {
@@ -339,16 +352,17 @@ class DataSlurper {
             if (child.hasProperty('attributes') && child.attributes.size() > 0) {
                 writer.write(' ')
                 boolean isLink
-                def attributes = child.attributes.collect {
-                    "${it.key}=\"${it.value}\""
-                }
+                def attributes = child.attributes
                 if (tag == 'a') {
                     isLink = true
                 }
-                if (isLink && !attributes.find { it =~ /target/ }) {
-                    attributes << 'target="_blank"'
+                if (isLink && !attributes.target) {
+                    attributes.target = "_blank"
                 }
-                writer.write(attributes.join(' '))
+                if (attributes.href) {
+                    attributes.href = attributes.href.replaceAll(/&/, '&amp;')
+                }
+                writer.write(attributes.collect { "${it.key}=\"${it.value}\""} .join(' '))
             }
             def hasChildren = child.hasProperty('children') && child.children.size() > 0
             if (hasChildren) {
