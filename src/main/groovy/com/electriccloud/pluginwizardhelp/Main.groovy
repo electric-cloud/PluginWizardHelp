@@ -9,6 +9,7 @@ class Main {
         cli.o(longOpt: 'out', type: String, required: false, 'output file path')
         cli.rd(longOpt: 'revision-date', type: String, 'custom revision date or -1 for no revision date')
         cli.v(longOpt: 'verbose', type: boolean, 'verbose level')
+        cli.c(longOpt: 'community', type: boolean, 'is a communtiy plugin?')
         def options = cli.parse(args)
 
         if (!options || options.help) {
@@ -40,18 +41,18 @@ class Main {
         assert path
         Logger logger = Logger.buildInstance(options.v)
         def generator = new HelpGenerator(pluginFolder: path, revisionDate: revisionDate)
-
+        if (options.community) {
+            generator.community = true
+        }
         String adoc = generator.generateAdoc()
-        File out = new File(path, "help/help.adoc")
+        File out
+        if (options.community) {
+            out = new File(path, "README.adoc")
+        } else {
+            out = new File(path, "help/help.adoc")
+        }
         out.write(adoc)
         logger.info "Saved adoc into $out.path"
-
-
-        //String help = generator.generate()
-        //new Validator().validate(help)
-        //File output = new File(outPath)
-        //output.write help
-        //logger.info("Saved content into ${outPath}")
     }
 
 

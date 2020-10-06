@@ -47,6 +47,7 @@ class FlowpdfSlurper extends DataSlurper {
             File spec = new File(pluginFolder, SPEC_PATH)
             def pluginspec = new Yaml().load(spec.text)
             metadata.pluginKey = pluginspec.pluginInfo.pluginName
+            metadata.pluginVersion = refineVersion(pluginspec.pluginInfo.version)
             return metadata
         }
     }
