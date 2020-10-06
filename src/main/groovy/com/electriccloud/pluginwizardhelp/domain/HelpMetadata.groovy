@@ -52,4 +52,6 @@ class HelpMetadata {
         return help
     }
 
+    String pluginVersion
+
 }

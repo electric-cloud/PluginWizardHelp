@@ -33,6 +33,7 @@ class HelpGenerator implements Constants {
     String pluginFolder
     String revisionDate
     boolean adoc
+    boolean community
 
     @Lazy(soft = true)
     DataSlurper slurper = {
@@ -92,7 +93,7 @@ class HelpGenerator implements Constants {
 
     Changelog changelogToAdoc(Changelog changelog) {
         for (def v in changelog.versions) {
-            v.changes = v.changes.collect {it }
+            v.changes = v.changes.collect { it }
         }
         return changelog
     }
@@ -125,7 +126,15 @@ class HelpGenerator implements Constants {
 
         def template = getTemplate("page.adoc")
         String help = template.make(parameters)
-        help = help.replaceAll(/(?i)CloudBees CD/, '{CD}')
+        if (community) {
+            help = help.replaceAll(/\Q{CD}/, "CloudBees CD")
+            help = help
+                .replaceAll(/@PLUGIN_VERSION@/, slurper.metadata.pluginVersion)
+                .replaceAll(/@PLUGIN_KEY@/, slurper.metadata.pluginKey)
+                .replaceAll(/@PLUGIN_NAME@/, slurper.metadata.pluginKey + '-' + slurper.metadata.pluginVersion)
+        } else {
+            help = help.replaceAll(/(?i)CloudBees CD/, '{CD}')
+        }
         help = cleanup(help)
 
         adoc = false
@@ -138,13 +147,21 @@ class HelpGenerator implements Constants {
         }
         String retval = Converter.convertMarkdownToAsciiDoc(md)
         def pluginKeyLowercase = this.slurper.metadata.pluginKey.toLowerCase()
-        retval = retval.replaceAll(/image:images\/([\w\/\-.]+?)\[(.+?)\]/) {
-            String imagePath = it[1]
-            if (imagePath =~ /[A-Z]/) {
-                logger.warning("The path $imagePath contains invalid symbols")
+        if (community) {
+            retval = retval.replaceAll(/image:images\/([\w\/\-.]+?)\[(.+?)\]/) {
+                String imagePath = it[1]
+                "image::htdocs/images/$imagePath[image]"
             }
-            imagePath = imagePath.toLowerCase()
-            "image::cloudbees-common::cd-plugins/$pluginKeyLowercase/$imagePath[image]"
+        } else {
+
+            retval = retval.replaceAll(/image:images\/([\w\/\-.]+?)\[(.+?)\]/) {
+                String imagePath = it[1]
+                if (imagePath =~ /[A-Z]/) {
+                    logger.warning("The path $imagePath contains invalid symbols")
+                }
+                imagePath = imagePath.toLowerCase()
+                "image::cloudbees-common::cd-plugins/$pluginKeyLowercase/$imagePath[image]"
+            }
         }
         return retval
     }

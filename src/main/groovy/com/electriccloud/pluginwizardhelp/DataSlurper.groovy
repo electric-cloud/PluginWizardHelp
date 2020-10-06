@@ -31,6 +31,11 @@ class DataSlurper {
         this.pluginFolder = pluginFolder
     }
 
+    static String refineVersion(String version) {
+        def(major, minor, patch) = version.split(/\./)
+        return "${major}.${minor}.${patch}"
+    }
+
     HelpMetadata readHelpMetadata() {
         def helpFile = fileByGlob(new File(pluginFolder, HELP_FOLDER), METADATA_GLOB)
         if (!helpFile || !helpFile.exists()) {
@@ -47,6 +52,8 @@ class DataSlurper {
                 def node = new XmlSlurper().parse(metafile)
                 def pluginKey = node.key
                 metadata.pluginKey = pluginKey
+                String version = refineVersion(node.version)
+                metadata.pluginVersion = version
             }
             else {
                 metadata.pluginKey = new File(pluginFolder).name
