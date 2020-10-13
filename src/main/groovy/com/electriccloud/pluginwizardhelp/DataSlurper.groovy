@@ -52,7 +52,7 @@ class DataSlurper {
                 def node = new XmlSlurper().parse(metafile)
                 def pluginKey = node.key
                 metadata.pluginKey = pluginKey
-                String version = refineVersion(node.version)
+                String version = refineVersion(node.version.toString())
                 metadata.pluginVersion = version
             }
             else {
