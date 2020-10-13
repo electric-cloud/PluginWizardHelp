@@ -63,7 +63,7 @@ ${configurationProcedure.preface}
 |===
 |Parameter |Description
 <% for (def field in configurationProcedure.fields) { %>
-|${field.name} | ${field.documentation}
+|<% if (field.required) { print "__**" } %>${field.name}<% if (field.required) { print "**__" } %> | ${field.documentation}
 <% } %>
 |===
 <% if (configurationProcedure.postface) { %>
@@ -97,7 +97,7 @@ ${procedure.preface}
 |===
 | Parameter | Description
 <% for (def field in procedure.fields) { %>
-| ${field.name} | ${field.documentation.replaceAll(/[|]/, "\\\\|")}
+| <% if (field.required) { print "__**" } %>${field.name}<% if (field.required) { print "**__" } %> | ${field.documentation.replaceAll(/[|]/, "\\\\|")}
 <% } %>
 |===
 
