@@ -15,7 +15,7 @@ ${overview}
 ${chaptersPlacement.place('after', 'overview')}
 ${chaptersPlacement.place('before', 'supported_versions')}
 <% if (supportedVersions) { %>
-== Supported Versions
+== Supported versions
 <% if (supportedVersionsText) { %>
 $supportedVersionsText
 <% } else { %>
@@ -35,7 +35,7 @@ ${prerequisites}
 ${chaptersPlacement.place('after', 'prerequisites')}
 <% if (configurationProcedure) { %>
 
-== Plugin Configurations
+== Plugin configurations
 Plugin configurations are sets of parameters that apply
 across some or all of the plugin procedures. They
 reduce repetition of common values, create
@@ -45,10 +45,10 @@ is given a unique name that is entered in designated
 parameters on procedures that use them.
 
 
-=== Creating Plugin Configurations
+=== Creating plugin configurations
 To create plugin configurations in {CD}, do these steps:
 
-* Go to **Administration** &gt;**Plugins** to open the Plugin Manager.
+* Go to menu:Admistration[Plugins] to open the Plugin Manager.
 * Find the @PLUGIN_NAME@ row.
 * Click *Configure* to open the
      Configurations page.
@@ -58,7 +58,7 @@ To create plugin configurations in {CD}, do these steps:
 ${configurationProcedure.preface}
 <% } %>
 
-=== Configuration Procedure Parameters
+=== Configuration procedure parameters
 [cols=",",options="header",]
 |===
 |Parameter |Description
@@ -74,7 +74,7 @@ ${configurationProcedure.postface}
 ${chaptersPlacement.place('before', 'procedures')}
 
 [[procedures]]
-== Plugin Procedures
+== Plugin procedures
 <% if (proceduresPreface) { %>
 ${proceduresPreface}
 <% } %>
@@ -92,7 +92,7 @@ ${procedure.description}
 ${procedure.preface}
 <% } %>
 
-==== ${procedure.name} Parameters
+==== ${procedure.name} parameters
 [cols=",",options="header",]
 |===
 | Parameter | Description
@@ -103,7 +103,7 @@ ${procedure.preface}
 
 <% if (procedure.outputParameters != null) { %>
 
-==== Output Parameters
+==== Output parameters
 
 [cols=",",options="header",]
 |===
@@ -126,7 +126,7 @@ ${chaptersPlacement.place('before', 'use_cases')}
 
 <% if (useCases) { %>
 
-== Use Cases
+== Use cases
 
 <% useCases.each { useCase -> %>
 [[${useCase.id}]]
@@ -137,7 +137,7 @@ ${chaptersPlacement.place('after', 'use_cases')}
 ${chaptersPlacement.place('before', 'known_issues')}
 <% if (knownIssues) { %>
 
-== Known Issues
+== Known issues
 ${knownIssues}
 <% } %>
 ${chaptersPlacement.place('after', 'known_issues')}
