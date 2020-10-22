@@ -66,10 +66,10 @@ class DataSlurper {
     }
 
     def addMetaChapter(HelpMetadata metadata, String name) {
-        def chapter = new File(pluginFolder, "help/${name}.md")
+        def chapter = new File(pluginFolder, "help/${name}.adoc")
         if (chapter.exists()) {
             if (metadata.getProperty(name)) {
-                logger.warning("$name in metadata.yaml will be overriden by ${name}.md")
+                logger.warning("$name in metadata.yaml will be overriden by ${name}.adoc")
             }
             metadata.setProperty(name, chapter.text)
         } else {
@@ -191,7 +191,7 @@ class DataSlurper {
     }
 
     String getProcedurePreface(procedureFolder) {
-        File file = new File(procedureFolder, "preface.md")
+        File file = new File(procedureFolder, "preface.adoc")
         if (file.exists()) {
             return file.text
         } else {
@@ -200,7 +200,7 @@ class DataSlurper {
     }
 
     String getProcedurePostface(procedureFolder) {
-        File file = new File(procedureFolder, "postface.md")
+        File file = new File(procedureFolder, "postface.adoc")
         if (file.exists()) {
             return file.text
         } else {

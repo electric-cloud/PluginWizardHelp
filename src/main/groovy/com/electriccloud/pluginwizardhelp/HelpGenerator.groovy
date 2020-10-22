@@ -134,6 +134,7 @@ class HelpGenerator implements Constants {
                 .replaceAll(/@PLUGIN_NAME@/, slurper.metadata.pluginKey + '-' + slurper.metadata.pluginVersion)
         } else {
             help = help.replaceAll(/(?i)CloudBees CD/, '{CD}')
+            help = help.replaceAll(/(?i)CloudBees Core/, '{CI}')
         }
         help = cleanup(help)
 
@@ -145,6 +146,7 @@ class HelpGenerator implements Constants {
         if (!md) {
             md = ''
         }
+        return md
         String retval = Converter.convertMarkdownToAsciiDoc(md)
         def pluginKeyLowercase = this.slurper.metadata.pluginKey.toLowerCase()
         if (community) {

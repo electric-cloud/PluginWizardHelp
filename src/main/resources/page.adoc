@@ -95,7 +95,7 @@ ${procedure.preface}
 ==== ${procedure.name} parameters
 [cols=",",options="header",]
 |===
-| Parameter | Description
+|Parameter |Description
 <% for (def field in procedure.fields) { %>
 | <% if (field.required) { print "__**" } %>${field.name}<% if (field.required) { print "**__" } %> | ${field.documentation.replaceAll(/[|]/, "\\\\|")}
 <% } %>
@@ -107,9 +107,9 @@ ${procedure.preface}
 
 [cols=",",options="header",]
 |===
-| Parameter | Description
+|Parameter |Description
 <% for (def param in procedure.outputParameters) { %>
-| ${param.name} | ${param.description.replaceAll(/\|/, "\\|")}
+|${param.name} |${param.description.replaceAll(/\|/, "\\|")}
 <% } %>
 |===
 <% } %>
@@ -129,7 +129,6 @@ ${chaptersPlacement.place('before', 'use_cases')}
 == Use cases
 
 <% useCases.each { useCase -> %>
-[[${useCase.id}]]
 ${useCase.body}
 <% } } %>
 
