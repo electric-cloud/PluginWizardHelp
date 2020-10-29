@@ -132,6 +132,7 @@ class HelpGenerator implements Constants {
                 .replaceAll(/@PLUGIN_VERSION@/, slurper.metadata.pluginVersion)
                 .replaceAll(/@PLUGIN_KEY@/, slurper.metadata.pluginKey)
                 .replaceAll(/@PLUGIN_NAME@/, slurper.metadata.pluginKey + '-' + slurper.metadata.pluginVersion)
+                .replaceAll(/\Qmenu:Admistration[Plugins]/, 'Adminstration -> Plugins')
         } else {
             help = help.replaceAll(/(?i)CloudBees CD/, '{CD}')
             help = help.replaceAll(/(?i)CloudBees Core/, '{CI}')

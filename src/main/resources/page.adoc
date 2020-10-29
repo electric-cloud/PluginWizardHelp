@@ -36,6 +36,7 @@ ${chaptersPlacement.place('after', 'prerequisites')}
 <% if (configurationProcedure) { %>
 
 == Plugin configurations
+
 Plugin configurations are sets of parameters that apply
 across some or all of the plugin procedures. They
 reduce repetition of common values, create
@@ -46,6 +47,7 @@ parameters on procedures that use them.
 
 
 === Creating plugin configurations
+
 To create plugin configurations in {CD}, do these steps:
 
 * Go to menu:Admistration[Plugins] to open the Plugin Manager.
@@ -59,6 +61,7 @@ ${configurationProcedure.preface}
 <% } %>
 
 === Configuration procedure parameters
+
 [cols=",",options="header",]
 |===
 |Parameter |Description
@@ -75,6 +78,7 @@ ${chaptersPlacement.place('before', 'procedures')}
 
 [[procedures]]
 == Plugin procedures
+
 <% if (proceduresPreface) { %>
 ${proceduresPreface}
 <% } %>
