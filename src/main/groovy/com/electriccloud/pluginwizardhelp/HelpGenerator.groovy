@@ -163,7 +163,7 @@ class HelpGenerator implements Constants {
                     logger.warning("The path $imagePath contains invalid symbols")
                 }
                 imagePath = imagePath.toLowerCase()
-                "image::cloudbees-common::cd-plugins/$pluginKeyLowercase/$imagePath[image]"
+                "image::cloudbees-common-sda::cd-plugins/$pluginKeyLowercase/$imagePath[image]"
             }
         }
         return retval
