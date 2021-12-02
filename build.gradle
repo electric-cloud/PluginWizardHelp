@@ -51,7 +51,7 @@ sourceSets {
 
 
 group = 'com.electriccloud'
-version = '1.23-SNAPSHOT'
+version = '1.24-SNAPSHOT'
 
 shadowJar {
     baseName = 'plugin-wizard-help'
