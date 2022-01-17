@@ -109,7 +109,7 @@ ${procedure.preface}
 
 ==== Output parameters
 
-[cols=",",options="header",]
+[cols=",",options="header"]
 |===
 |Parameter |Description
 <% for (def param in procedure.outputParameters) { %>
