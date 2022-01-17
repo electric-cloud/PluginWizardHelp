@@ -1,7 +1,11 @@
 
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
+        maven {
+            url "http://art.nimbus.beescloud.com:80/artifactory/jcenter/"
+        }
+        //jcenter()
 
     }
     dependencies {
@@ -23,8 +27,11 @@ defaultTasks 'shadowJar'
 
 
 repositories {
-    jcenter()
     mavenCentral()
+    maven {
+        url "http://art.nimbus.beescloud.com:80/artifactory/jcenter/"
+    }
+    //jcenter()
 }
 
 dependencies {
