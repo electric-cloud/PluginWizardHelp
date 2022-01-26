@@ -20,7 +20,21 @@ class Changelog {
 
     List<Version> getOrderedVersions() {
         versions.sort { a, b ->
-            b.version <=> a.version
+            List verA = a.version.tokenize('.')
+            List verB = b.version.tokenize('.')
+
+            def commonIndices = Math.min(verA.size(), verB.size())
+
+            for (int i = 0; i < commonIndices; ++i) {
+                def numA = verA[i].toInteger()
+                def numB = verB[i].toInteger()
+
+                if (numA != numB) {
+                    return numB <=> numA
+                }
+            }
+
+            verB.size() <=> verA.size()
         }
     }
 

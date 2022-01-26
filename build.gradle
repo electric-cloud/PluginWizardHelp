@@ -1,6 +1,7 @@
 
 buildscript {
     repositories {
+        mavenLocal()
         mavenCentral()
         maven {
             url "http://art.nimbus.beescloud.com:80/artifactory/jcenter/"
@@ -27,6 +28,7 @@ defaultTasks 'shadowJar'
 
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven {
         url "http://art.nimbus.beescloud.com:80/artifactory/jcenter/"
@@ -58,7 +60,7 @@ sourceSets {
 
 
 group = 'com.electriccloud'
-version = '1.25-SNAPSHOT'
+version = '1.26-SNAPSHOT'
 
 shadowJar {
     baseName = 'plugin-wizard-help'
