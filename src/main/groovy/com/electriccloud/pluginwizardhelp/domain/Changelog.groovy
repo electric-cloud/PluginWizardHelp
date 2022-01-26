@@ -30,11 +30,11 @@ class Changelog {
                 def numB = verB[i].toInteger()
 
                 if (numA != numB) {
-                    return numA <=> numB
+                    return numB <=> numA
                 }
             }
 
-            verA.size() <=> verB.size()
+            verB.size() <=> verA.size()
         }
     }
 
