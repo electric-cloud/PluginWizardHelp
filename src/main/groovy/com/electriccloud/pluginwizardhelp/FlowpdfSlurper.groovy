@@ -108,7 +108,7 @@ class FlowpdfSlurper extends DataSlurper {
                 ))
             }
             def outputParameters = proc.outputParameters?.collect {
-                [name: it.key, description: it.value]
+                [name: it.name, description: it.description]
             }
             def procedure = new Procedure(name: proc.name, description: proc.description, fields: fields, outputParameters: outputParameters)
             def folderName = procedure.name.replaceAll(/\W/, '')
