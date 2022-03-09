@@ -101,6 +101,7 @@ class FlowpdfSlurper extends DataSlurper {
                 )
             }
             if (proc.hasConfig) {
+                fields = fields ?: []
                 fields.add(0, new Field(
                     name: 'Configuration Name',
                     documentation: 'Previously defined configuration for the plugin',
