@@ -1,0 +1,17 @@
+// Automatically generated file - DO NOT EDIT.
+// For information on the CD/RO plugin documentation automation, refer to https://engineering.beescloud.com/docs/team-processes/latest/checklists/cd-api-docs.
+
+<% if (dependencies) { %>
+= Third-party dependencies
+
+.Third-party dependencies
+[cols="1a,1a",options="header"]
+|===
+|Module |License
+<% for (def module in dependencies ) { %>
+|link:${module.url}[${module.name}:${module.version}]
+|link:${module.licenseUrl}[${module.license}]
+<% } %>
+|===
+
+<% } %>

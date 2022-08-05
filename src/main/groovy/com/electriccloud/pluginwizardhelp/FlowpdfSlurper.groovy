@@ -1,11 +1,13 @@
 package com.electriccloud.pluginwizardhelp
 
 import com.electriccloud.pluginwizardhelp.domain.Changelog
+import com.electriccloud.pluginwizardhelp.domain.Dependency
 import com.electriccloud.pluginwizardhelp.domain.Field
 import com.electriccloud.pluginwizardhelp.domain.HelpMetadata
 import com.electriccloud.pluginwizardhelp.domain.Procedure
 import com.electriccloud.pluginwizardhelp.exceptions.InvalidPlugin
 import com.electriccloud.pluginwizardhelp.exceptions.SlurperException
+import groovy.json.JsonSlurper
 import groovy.util.slurpersupport.NodeChild
 import org.yaml.snakeyaml.Yaml
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml
@@ -76,6 +78,28 @@ class FlowpdfSlurper extends DataSlurper {
         }
     }
 
+
+    List<Dependency> readDependencies() {
+        File deps = new File(pluginFolder, 'help/dependencies.json')
+        def slurper = new JsonSlurper()
+        def dependencies = slurper.parse(deps)
+        /**
+         *
+
+         # {
+         #   'moduleName' => 'org.slf4j:jcl-over-slf4j',
+         #   'moduleLicense' => 'MIT License',
+         #   'moduleUrl' => 'http://www.slf4j.org',
+         #   'moduleVersion' => '1.7.25',
+         #   'moduleLicenseUrl' => 'http://www.opensource.org/licenses/mit-license.php'
+         # },
+
+         */
+        return dependencies.collect {
+            new Dependency(name: it.moduleName, license: it.moduleLicense, url: it.moduleUrl, version: it.moduleVersion, licenseUrl: it.moduleLicenseUrl)
+        }
+    }
+
     List<Procedure> readProcedures() {
         File spec = new File(pluginFolder, SPEC_PATH)
         def pluginspec = new Yaml().load(spec.text)
@@ -98,6 +122,7 @@ class FlowpdfSlurper extends DataSlurper {
                     required: r,
                     documentation: documentation,
                     type: it.type,
+                    adoc: it.adoc,
                 )
             }
             if (proc.hasConfig) {
@@ -109,7 +134,7 @@ class FlowpdfSlurper extends DataSlurper {
                 ))
             }
             def outputParameters = proc.outputParameters?.collect {
-                [name: it.name, description: it.description]
+                [name: it.name, description: it.description, adoc: it.adoc]
             }
             def procedure = new Procedure(name: proc.name, description: proc.description, fields: fields, outputParameters: outputParameters)
             def folderName = procedure.name.replaceAll(/\W/, '')

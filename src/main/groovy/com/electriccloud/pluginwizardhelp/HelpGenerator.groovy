@@ -98,8 +98,8 @@ class HelpGenerator implements Constants {
         return changelog
     }
 
-    String generateAdoc() {
-        adoc = true
+
+    private Map grabAdocParameters() {
         def parameters = [:]
         parameters.with {
             procedures = this.commonProcedures().collect { Procedure proc ->
@@ -122,7 +122,14 @@ class HelpGenerator implements Constants {
             supportedVersionsText = this.slurper.metadata.supportedVersionsText
             chaptersPlacement = generateChaptersPlacement(this.slurper.metadata.chapters)
             pluginKey = this.slurper.metadata.pluginKey
+            dependencies = this.slurper.readDependencies()
         }
+        return parameters
+    }
+
+    String generateAdoc() {
+        adoc = true
+        def parameters = grabAdocParameters()
 
         def template = getTemplate("page.adoc")
         String help = template.make(parameters)
@@ -141,6 +148,47 @@ class HelpGenerator implements Constants {
 
         adoc = false
         help
+    }
+
+    Map generatePartials() {
+        adoc = true
+        def parameters = grabAdocParameters()
+
+        def configTemplate = getTemplate("configuration.adoc")
+        String configuration = postprocess(configTemplate.make(parameters).toString())
+
+        def proceduresTemplate = getTemplate("procedures.adoc")
+        String procedures = postprocess(proceduresTemplate.make(parameters).toString())
+
+        def releaseNotesTemplate = getTemplate("releaseNotes.adoc")
+        String releaseNotes = postprocess(releaseNotesTemplate.make(parameters).toString())
+
+        def depsTemplate = getTemplate("dependencies.adoc")
+        String dependencies = postprocess(depsTemplate.make(parameters).toString())
+
+        adoc = false
+        return [
+            configuration: configuration,
+            procedures: procedures,
+            releaseNotes: releaseNotes,
+            dependencies: dependencies,
+        ]
+    }
+
+    private String postprocess(input) {
+        if (community) {
+            input = input.replaceAll(/\Q{CD}/, "CloudBees CD")
+            input = input
+                .replaceAll(/@PLUGIN_VERSION@/, slurper.metadata.pluginVersion)
+                .replaceAll(/@PLUGIN_KEY@/, slurper.metadata.pluginKey)
+                .replaceAll(/@PLUGIN_NAME@/, slurper.metadata.pluginKey + '-' + slurper.metadata.pluginVersion)
+                .replaceAll(/\Qmenu:Admistration[Plugins]/, 'Adminstration -> Plugins')
+        } else {
+            input = input.replaceAll(/(?i)CloudBees CD/, '{CD}')
+            input = input.replaceAll(/(?i)CloudBees Core/, '{CI}')
+        }
+        input = cleanup(input)
+        return input
     }
 
     String markdownToAdoc(String md) {

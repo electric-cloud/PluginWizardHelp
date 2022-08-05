@@ -1,0 +1,15 @@
+// Automatically generated file - DO NOT EDIT.
+// For information on the CD/RO plugin documentation automation, refer to https://engineering.beescloud.com/docs/team-processes/latest/checklists/cd-api-docs.
+
+.$pluginKey plugin configuration parameters
+[cols="1a,1a",options="header"]
+|===
+|Parameter
+|Description
+
+<% for (def field in configurationProcedure.fields) { %>
+|<% if (field.required) { print "__**" } %>${field.name}<% if (field.required) { print "**__" } %> | ${field.documentation}
+<% if (field.adoc) { %> ${field.adoc} <% } %>
+<% } %>
+
+|===

@@ -1,6 +1,7 @@
 package com.electriccloud.pluginwizardhelp
 
 import com.electriccloud.pluginwizardhelp.domain.Changelog
+import com.electriccloud.pluginwizardhelp.domain.Dependency
 import com.electriccloud.pluginwizardhelp.domain.Field
 import com.electriccloud.pluginwizardhelp.domain.HelpMetadata
 import com.electriccloud.pluginwizardhelp.domain.Procedure
@@ -34,6 +35,10 @@ class DataSlurper {
     static String refineVersion(String version) {
         def(major, minor, patch) = version.split(/\./)
         return "${major}.${minor}.${patch}"
+    }
+
+    List<Dependency> readDependencies() {
+        []
     }
 
     HelpMetadata readHelpMetadata() {

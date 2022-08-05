@@ -1,0 +1,9 @@
+// Automatically generated file - DO NOT EDIT.
+// For information on the CD/RO plugin documentation automation, refer to https://engineering.beescloud.com/docs/team-processes/latest/checklists/cd-api-docs.
+
+<% changelog.getOrderedVersions().each { version -> %>
+=== ${pluginKey} ${version.version}
+<% version.changes.each { change -> %>
+- ${change}
+<% } %>
+<% } %>

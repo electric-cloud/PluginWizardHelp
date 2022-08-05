@@ -6,4 +6,5 @@ class Field {
     boolean required
     String additionalDocumentation
     String type
+    String adoc
 }

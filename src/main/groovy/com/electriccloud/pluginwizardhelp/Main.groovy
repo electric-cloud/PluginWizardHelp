@@ -53,6 +53,14 @@ class Main {
         }
         out.write(adoc)
         logger.info "Saved adoc into $out.path"
+
+
+        def partials = generator.generatePartials()
+        partials.each {k, v ->
+            def file = new File(path, "help/${k}.adoc")
+            file.write(v)
+            logger.info "Saved adoc into $file.path"
+        }
     }
 
 
