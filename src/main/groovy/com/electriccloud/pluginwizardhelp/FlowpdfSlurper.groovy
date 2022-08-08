@@ -81,6 +81,9 @@ class FlowpdfSlurper extends DataSlurper {
 
     List<Dependency> readDependencies() {
         File deps = new File(pluginFolder, 'help/dependencies.json')
+        if (!deps.exists()) {
+            return []
+        }
         def slurper = new JsonSlurper()
         def dependencies = slurper.parse(deps)
         /**
