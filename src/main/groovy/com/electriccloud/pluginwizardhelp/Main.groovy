@@ -10,6 +10,7 @@ class Main {
         cli.rd(longOpt: 'revision-date', type: String, 'custom revision date or -1 for no revision date')
         cli.v(longOpt: 'verbose', type: boolean, 'verbose level')
         cli.c(longOpt: 'community', type: boolean, 'is a communtiy plugin?')
+        cli.pt(longOpt: 'partials', type: boolean, 'produce partials?')
         def options = cli.parse(args)
 
         if (!options || options.help) {
@@ -51,16 +52,21 @@ class Main {
         } else {
             out = new File(path, "help/help.adoc")
         }
-        out.write(adoc)
-        logger.info "Saved adoc into $out.path"
 
+        if (options.pt) {
+            def partials = generator.generatePartials()
+            partials.each { k, v ->
+                def file = new File(path, "help/${k}.adoc")
+                file.write(v)
+                logger.info "Saved adoc into $file.path"
+            }
+        } else {
 
-        def partials = generator.generatePartials()
-        partials.each {k, v ->
-            def file = new File(path, "help/${k}.adoc")
-            file.write(v)
-            logger.info "Saved adoc into $file.path"
+            out.write(adoc)
+            logger.info "Saved adoc into $out.path"
         }
+
+
     }
 
 
