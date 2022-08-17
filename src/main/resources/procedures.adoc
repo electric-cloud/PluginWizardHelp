@@ -1,5 +1,5 @@
 // Automatically generated file - DO NOT EDIT.
-// For information on the CD/RO plugin documentation automation, refer to https://engineering.beescloud.com/docs/team-processes/latest/checklists/cd-api-docs.
+// For information on the CD/RO plugin documentation automation, refer to https://engineering.beescloud.com/docs/team-processes/latest/checklists/cd-plugin-docs.
 
 <% procedures.each { procedure -> %>
 == ${procedure.name}
@@ -15,7 +15,7 @@ ${procedure.description}
 |Description
 
 <% for (def field in procedure.fields) { %>
-|<% if (field.required) { print "__**" } %>${field.name}<% if (field.required) { print "**__" } %> | ${field.documentation}
+|${field.name} | ${field.documentation}
 <% if (field.adoc) { %> ${field.adoc} <% } %>
 <% } %>
 
@@ -30,7 +30,7 @@ ${procedure.description}
 |Description
 
 <% for (def field in procedure.fields) { %>
-|<% if (field.required) { print "__**" } %>${field.name}<% if (field.required) { print "**__" } %> | ${field.documentation}
+|${field.name} | ${field.documentation}
 <% if (field.adoc) { %> ${field.adoc} <% } %>
 <% } %>
 |===
