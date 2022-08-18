@@ -163,16 +163,20 @@ class HelpGenerator implements Constants {
         def releaseNotesTemplate = getTemplate("releaseNotes.adoc")
         String releaseNotes = postprocess(releaseNotesTemplate.make(parameters).toString())
 
-        def depsTemplate = getTemplate("dependencies.adoc")
-        String dependencies = postprocess(depsTemplate.make(parameters).toString())
+        def retval = [
+            configuration: configuration,
+            procedures   : procedures,
+            releaseNotes : releaseNotes,
+        ]
+
+        if (parameters.dependencies) {
+            def depsTemplate = getTemplate("dependencies.adoc")
+            String dependencies = postprocess(depsTemplate.make(parameters).toString())
+            retval.dependencies = dependencies
+        }
 
         adoc = false
-        return [
-            configuration: configuration,
-            procedures: procedures,
-            releaseNotes: releaseNotes,
-            dependencies: dependencies,
-        ]
+        return retval
     }
 
     private String postprocess(input) {

@@ -4,6 +4,6 @@
 <% changelog.getOrderedVersions().each { version -> %>
 === ${pluginKey} ${version.version}
 <% version.changes.each { change -> %>
-- ${change}
+* ${change}
 <% } %>
 <% } %>
