@@ -52,7 +52,7 @@ To create plugin configurations in {PRODUCT}, complete these steps:
 * Go to menu:Administration[Plugins] to open the Plugin Manager.
 * Find the @PLUGIN_NAME@ row.
 * Click *Configure* to open the
-Configurations page.
+     Configurations page.
 * Click *Create Configuration* as per the description of parameters below.
 
 <% if (configurationProcedure.preface) { %>
