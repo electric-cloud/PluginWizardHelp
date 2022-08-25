@@ -166,7 +166,7 @@ class HelpGenerator implements Constants {
         def retval = [
             configuration: configuration,
             procedures   : procedures,
-            releaseNotes : releaseNotes,
+            'release-notes' : releaseNotes,
         ]
 
         if (parameters.dependencies) {

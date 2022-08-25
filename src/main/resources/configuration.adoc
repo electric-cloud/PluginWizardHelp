@@ -8,8 +8,8 @@
 |Description
 
 <% for (def field in configurationProcedure.fields) { %>
-|${field.name} | ${field.documentation}
-<% if (field.adoc) { %> ${field.adoc} <% } %>
+|${field.name} |
+<% if (field.adoc) { %> ${field.adoc} <% } else  { %> ${field.documentation} <% } %>
 <% } %>
 
 |===
