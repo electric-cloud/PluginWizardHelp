@@ -37,18 +37,17 @@ ${chaptersPlacement.place('after', 'prerequisites')}
 
 == Plugin configurations
 
-Plugin configurations are sets of parameters that apply
-across some or all of the plugin procedures. They
-reduce repetition of common values, create
-predefined parameter sets for end users, and
-securely store credentials where needed. Each configuration
-is given a unique name that is entered in designated
-parameters on procedures that use them.
+Plugin configurations are sets of parameters that can be applied
+across some, or all, of the plugin procedures. They
+can reduce the repetition of common values, create
+predefined parameter sets, and securely store credentials.
+Each configuration is given a unique name that is entered
+in the designated parameter for the plugin procedures that use them.
 
 
 === Creating plugin configurations
 
-To create plugin configurations in {CD}, do these steps:
+To create plugin configurations in {PRODUCT}, complete these steps:
 
 * Go to menu:Administration[Plugins] to open the Plugin Manager.
 * Find the @PLUGIN_NAME@ row.
@@ -62,7 +61,7 @@ ${configurationProcedure.preface}
 
 === Configuration procedure parameters
 
-[cols=",",options="header"]
+[cols="1a,1a",options="header"]
 |===
 |Parameter |Description
 <% for (def field in configurationProcedure.fields) { %>
@@ -97,7 +96,7 @@ ${procedure.preface}
 <% } %>
 
 ==== ${procedure.name} parameters
-[cols=",",options="header"]
+[cols="1a,1a",options="header"]
 |===
 |Parameter |Description
 <% for (def field in procedure.fields) { %>
@@ -109,7 +108,7 @@ ${procedure.preface}
 
 ==== Output parameters
 
-[cols=",",options="header"]
+[cols="1a,1a",options="header"]
 |===
 |Parameter |Description
 <% for (def param in procedure.outputParameters) { %>
