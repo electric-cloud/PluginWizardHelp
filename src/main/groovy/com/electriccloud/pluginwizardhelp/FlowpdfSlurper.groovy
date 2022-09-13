@@ -5,6 +5,7 @@ import com.electriccloud.pluginwizardhelp.domain.Dependency
 import com.electriccloud.pluginwizardhelp.domain.Field
 import com.electriccloud.pluginwizardhelp.domain.HelpMetadata
 import com.electriccloud.pluginwizardhelp.domain.Procedure
+import com.electriccloud.pluginwizardhelp.domain.ReportObject
 import com.electriccloud.pluginwizardhelp.exceptions.InvalidPlugin
 import com.electriccloud.pluginwizardhelp.exceptions.SlurperException
 import groovy.json.JsonSlurper
@@ -100,6 +101,32 @@ class FlowpdfSlurper extends DataSlurper {
          */
         return dependencies.collect {
             new Dependency(name: it.moduleName, license: it.moduleLicense, url: it.moduleUrl, version: it.moduleVersion, licenseUrl: it.moduleLicenseUrl)
+        }
+    }
+
+
+    List<ReportObject> collectReportingData() {
+        File spec = new File(pluginFolder, SPEC_PATH)
+        def pluginspec = new Yaml().load(spec.text)
+        return pluginspec?.devOpsInsight?.supportedReports?.collect {
+            def reportObjectType = it.reportObjectType
+
+            List<Field> fields = it?.parameters?.collect {
+                def documentation = it.adoc ?: it.htmlDocumentation ?: it.documentation
+                if (!documentation) {
+                    logger.warning("Documentation not found for $it.name: $proc.name")
+                }
+                boolean r = it.required instanceof Boolean ? it.required : it.required == "true" || it.required == '1'
+                new Field(
+                    name: it.label ?: it.name,
+                    required: r,
+                    documentation: documentation,
+                    type: it.type,
+                    adoc: it.adoc,
+                )
+            }
+
+            return new ReportObject(type: reportObjectType, fields: fields)
         }
     }
 

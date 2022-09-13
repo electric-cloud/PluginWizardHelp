@@ -1,0 +1,25 @@
+// Automatically generated file - DO NOT EDIT.
+// For information on the CD/RO plugin documentation automation, refer to https://engineering.beescloud.com/docs/team-processes/latest/checklists/cd-plugin-docs.
+
+== Collect Reporting Data
+
+Collects reporting data from a Git repository and sends it to the {PRODUCT} reporting server.
+
+<% for (def report in reports) { %>
+
+=== Input parameters for ${report.type}
+
+.Collect Reporting Data input parameters
+[cols="1a,1a",options="header"]
+|===
+|Parameter
+|Description
+
+<% for (def field in report.fields) { %>
+|${field.name} |
+<% if (field.adoc) { %> ${field.adoc} <% } else {  %> %{field.documentation} <% } %>
+<% } %>
+
+|===
+
+<% } %>

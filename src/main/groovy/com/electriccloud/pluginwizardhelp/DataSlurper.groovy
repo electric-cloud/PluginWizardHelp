@@ -5,6 +5,7 @@ import com.electriccloud.pluginwizardhelp.domain.Dependency
 import com.electriccloud.pluginwizardhelp.domain.Field
 import com.electriccloud.pluginwizardhelp.domain.HelpMetadata
 import com.electriccloud.pluginwizardhelp.domain.Procedure
+import com.electriccloud.pluginwizardhelp.domain.ReportObject
 import com.electriccloud.pluginwizardhelp.exceptions.InvalidPlugin
 import com.electriccloud.pluginwizardhelp.exceptions.SlurperException
 import groovy.util.slurpersupport.NodeChild
@@ -92,6 +93,10 @@ class DataSlurper {
             Changelog changelog = Changelog.fromYaml(changelogFile)
             return changelog
         }
+    }
+
+    List<ReportObject> collectReportingData() {
+        []
     }
 
     List<Procedure> readProcedures() {

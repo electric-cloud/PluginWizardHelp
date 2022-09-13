@@ -123,6 +123,7 @@ class HelpGenerator implements Constants {
             chaptersPlacement = generateChaptersPlacement(this.slurper.metadata.chapters)
             pluginKey = this.slurper.metadata.pluginKey
             dependencies = this.slurper.readDependencies()
+            reports = this.slurper.collectReportingData()
         }
         return parameters
     }
@@ -173,6 +174,12 @@ class HelpGenerator implements Constants {
             def depsTemplate = getTemplate("dependencies.adoc")
             String dependencies = postprocess(depsTemplate.make(parameters).toString())
             retval.dependencies = dependencies
+        }
+
+        if (parameters.reports?.size()) {
+            def reportsTemplate = getTemplate('reporting.adoc')
+            String reports = postprocess(reportsTemplate.make(parameters).toString())
+            retval['reporting-data'] = reports
         }
 
         adoc = false
