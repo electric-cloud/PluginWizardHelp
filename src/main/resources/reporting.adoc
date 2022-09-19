@@ -7,7 +7,7 @@
 
 === Input parameters
 
-.Collect Reporting Data input parameters
+.${report.title} input parameters
 [cols="1a,1a",options="header"]
 |===
 |Parameter
