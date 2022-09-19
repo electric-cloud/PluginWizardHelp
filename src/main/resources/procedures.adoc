@@ -16,7 +16,7 @@ ${procedure.description}
 
 <% for (def field in procedure.fields) { %>
 |${field.name} |
-<% if (field.adoc) { %> ${field.adoc} <% } else {  %> %{field.documentation} <% } %>
+<% if (field.adoc) { %>${field.adoc}<% } else {  %>${field.documentation}<% } %>
 <% } %>
 
 |===
@@ -31,7 +31,7 @@ ${procedure.description}
 
 <% for (def field in procedure.fields) { %>
 |${field.name} |
-<% if (field.adoc) { %> ${field.adoc} <% } else {  %> ${field.documentation} <% } %>
+<% if (field.adoc) { %>${field.adoc}<% } else {  %>${field.documentation}<% } %>
 <% } %>
 |===
 

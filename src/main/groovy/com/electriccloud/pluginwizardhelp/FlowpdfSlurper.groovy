@@ -187,6 +187,7 @@ class FlowpdfSlurper extends DataSlurper {
                     required: r,
                     documentation: documentation,
                     type: it.type,
+                    adoc: it.adoc,
                 )
             } ?: []
 

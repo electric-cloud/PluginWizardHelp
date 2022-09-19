@@ -165,7 +165,7 @@ class HelpGenerator implements Constants {
         String releaseNotes = postprocess(releaseNotesTemplate.make(parameters).toString())
 
         def retval = [
-            configuration: configuration,
+            configurations: configuration,
             procedures   : procedures,
             'release-notes' : releaseNotes,
         ]

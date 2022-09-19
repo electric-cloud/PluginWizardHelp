@@ -9,8 +9,8 @@
 |===
 |Module |License
 <% for (def module in dependencies ) { %>
-|link:${module.url}[${module.name}:${module.version}]
-|link:${module.licenseUrl}[${module.license}]
+<% if (module.url) { %>|link:${module.url}[${module.name}:${module.version}]<% } else { %>|${module.name}:${module.version}<% } %>
+<% if (module.licenseUrl) { %>|link:${module.licenseUrl}[${module.license}]<% } else { %>|${module.license}<% } %>
 <% } %>
 |===
 

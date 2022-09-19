@@ -9,7 +9,7 @@
 
 <% for (def field in configurationProcedure.fields) { %>
 |${field.name} |
-<% if (field.adoc) { %> ${field.adoc} <% } else  { %> ${field.documentation} <% } %>
+<% if (field.adoc) { %>${field.adoc}<% } else  { %>${field.documentation} <% } %>
 <% } %>
 
 |===
