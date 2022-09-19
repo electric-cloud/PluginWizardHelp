@@ -110,6 +110,10 @@ class FlowpdfSlurper extends DataSlurper {
         def pluginspec = new Yaml().load(spec.text)
         return pluginspec?.devOpsInsight?.supportedReports?.collect {
             def reportObjectType = it.reportObjectType
+            List<String> words = reportObjectType.split(/_/)
+            words[0] = words[0].capitalize()
+            def title = words.join(' ')
+
 
             List<Field> fields = it?.parameters?.collect {
                 def documentation = it.adoc ?: it.htmlDocumentation ?: it.documentation
@@ -126,7 +130,7 @@ class FlowpdfSlurper extends DataSlurper {
                 )
             }
 
-            return new ReportObject(type: reportObjectType, fields: fields)
+            return new ReportObject(type: reportObjectType, fields: fields, title: title)
         }
     }
 

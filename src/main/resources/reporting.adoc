@@ -3,7 +3,7 @@
 
 <% for (def report in reports) { %>
 
-== ${report.type}
+== ${report.title}
 
 === Input parameters
 
