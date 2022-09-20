@@ -10,7 +10,7 @@
 |Module |License
 <% for (def module in dependencies ) { %>
 <% if (module.url) { %>|link:${module.url}[${module.name}:${module.version}]<% } else { %>|${module.name}:${module.version}<% } %>
-<% if (module.licenseUrl) { %>|link:${module.licenseUrl}[${module.license}]<% } else { %>|${module.license}<% } %>
+<% if (module.license && module.licenseUrl ) { %>|link:${module.licenseUrl}[${module.license}]<% } else { %>|${module.license}<% } %>
 <% } %>
 |===
 
