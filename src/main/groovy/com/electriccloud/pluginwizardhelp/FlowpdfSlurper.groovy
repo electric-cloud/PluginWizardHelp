@@ -100,7 +100,7 @@ class FlowpdfSlurper extends DataSlurper {
 
          */
         return dependencies.collect {
-            new Dependency(name: it.moduleName, license: it.moduleLicense, url: it.moduleUrl, version: it.moduleVersion, licenseUrl: it.moduleLicenseUrl)
+            new Dependency(name: it.moduleName, license: it.moduleLicense ?: '', url: it.moduleUrl ?: '', version: it.moduleVersion, licenseUrl: it.moduleLicenseUrl)
         }
     }
 
