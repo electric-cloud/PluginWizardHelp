@@ -29,9 +29,9 @@ ${procedure.description}
 |Parameter
 |Description
 
-<% for (def field in procedure.fields) { %>
+<% for (def field in procedure.outputParameters) { %>
 |${field.name} |
-<% if (field.adoc) { %>${field.adoc}<% } else {  %>${field.documentation}<% } %>
+<% if (field.adoc) { %>${field.adoc}<% } else {  %>${field.description}<% } %>
 <% } %>
 |===
 

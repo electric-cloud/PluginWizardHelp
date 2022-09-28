@@ -20,6 +20,8 @@ class FlowpdfSlurper extends DataSlurper {
     private static String CHANGELOG_GLOB = 'changelog.y*ml'
     private static String SPEC_PATH = 'config/pluginspec.yaml'
 
+    ResourceBundle bundle = ResourceBundle.getBundle("messages", Locale.forLanguageTag("en-US"))
+
     String pluginFolder
     Logger logger = Logger.getInstance()
     @Lazy(soft = true)
@@ -162,16 +164,16 @@ class FlowpdfSlurper extends DataSlurper {
             if (proc.hasConfig) {
                 fields = fields ?: []
                 fields.add(0, new Field(
-                    name: 'Configuration Name',
-                    documentation: 'Previously defined configuration for the plugin',
+                    name: bundle.getString('configLabel'),
+                    documentation: bundle.getString('configDescr'),
                     required: true
                 ))
             }
             def outputParameters = proc.outputParameters?.collect {
                 [
-                        name: it instanceof LinkedHashMap ? it.name : it.key,
-                        description: it instanceof LinkedHashMap ? it.description : it.value,
-                        adoc: it instanceof LinkedHashMap ? it.adoc : '',
+                    name       : it instanceof LinkedHashMap ? it.name : it.key,
+                    description: it instanceof LinkedHashMap ? it.description : it.value,
+                    adoc       : it instanceof LinkedHashMap ? it.adoc : '',
                 ]
             }
             def procedure = new Procedure(name: proc.name, description: proc.description, fields: fields, outputParameters: outputParameters)
@@ -218,26 +220,26 @@ class FlowpdfSlurper extends DataSlurper {
                 def rest = pluginspec.configuration.restConfigInfo
                 def endpointLabel = rest.endpointLabel ?: 'REST API Endpoint'
                 configParams << new Field(
-                    name: 'Configuration Name',
+                    name: bundle.getString('configLabel'),
                     required: true,
-                    documentation: 'Unique name for the configuration',
+                    documentation: bundle.getString('configDescr'),
                     type: 'entry'
                 )
                 configParams << new Field(
-                    name: 'Description',
+                    name: bundle.getString('configDescrLabel'),
                     required: false,
-                    documentation: 'Configuration description',
+                    documentation: bundle.getString('configDescrDescr'),
                     type: 'entry'
                 )
-                configParams <<  new Field(
+                configParams << new Field(
                     name: endpointLabel,
                     required: true,
                     documentation: rest.endpointDescription,
                     type: 'entry',
                 )
                 configParams << new Field(
-                    name: 'Auth Scheme',
-                    documentation: 'Authorization scheme for the third-party connection.',
+                    name: bundle.getString('authSchemeLabel'),
+                    documentation:  bundle.getString('authSchemeDescr'),
                     type: 'entry',
                     required: true
                 )
@@ -245,8 +247,8 @@ class FlowpdfSlurper extends DataSlurper {
                 //todo auth schemes
                 if (rest.hasDebugLevel == 'true') {
                     configParams << new Field(
-                        name: "Debug Level",
-                        documentation: 'This option sets debug level for logs. If info is selected, only summary information will be shown, for debug, there will be some debug information and for trace the whole requests and responses will be shown.',
+                        name: bundle.getString('debugLevelLabel'),
+                        documentation: bundle.getString('debugLevelDescr'),
                         type: 'entry',
                         required: false
                     )
@@ -255,16 +257,16 @@ class FlowpdfSlurper extends DataSlurper {
 
             if (pluginspec.configuration.checkConnection) {
                 configParams << new Field(
-                    name: 'Check Connection?',
+                    name: bundle.getString('checkConnLabel'),
                     required: false,
-                    documentation: 'If checked, the connection endpoint and credentials entered as part of the configuration will be tested. If this option is checked, configuration will not be saved if the test fails.'
+                    documentation: bundle.getString('checkConnDescr')
                 )
             }
             if (pluginspec.configuration.hasDebugLevel) {
                 configParams << new Field(
-                    name: 'Debug Level',
+                    name: bundle.getString('debugLevelLabel'),
                     required: false,
-                    documentation: 'This option sets debug level for logs. If info is selected, only summary information will be shown, for debug, there will be some debug information and for trace the whole requests and responses will be shown.'
+                    documentation: bundle.getString('debugLevelDescr')
                 )
             }
 

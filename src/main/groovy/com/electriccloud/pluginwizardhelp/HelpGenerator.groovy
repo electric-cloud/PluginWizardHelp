@@ -187,13 +187,13 @@ class HelpGenerator implements Constants {
     }
 
     private String postprocess(input) {
+        input = input
+            .replaceAll(/@PLUGIN_VERSION@/, slurper.metadata.pluginVersion)
+            .replaceAll(/@PLUGIN_KEY@/, slurper.metadata.pluginKey)
+            .replaceAll(/@PLUGIN_NAME@/, slurper.metadata.pluginKey + '-' + slurper.metadata.pluginVersion)
+            .replaceAll(/\Qmenu:Admistration[Plugins]/, 'Adminstration -> Plugins')
         if (community) {
             input = input.replaceAll(/\Q{CD}/, "CloudBees CD")
-            input = input
-                .replaceAll(/@PLUGIN_VERSION@/, slurper.metadata.pluginVersion)
-                .replaceAll(/@PLUGIN_KEY@/, slurper.metadata.pluginKey)
-                .replaceAll(/@PLUGIN_NAME@/, slurper.metadata.pluginKey + '-' + slurper.metadata.pluginVersion)
-                .replaceAll(/\Qmenu:Admistration[Plugins]/, 'Adminstration -> Plugins')
         } else {
             input = input.replaceAll(/(?i)CloudBees CD/, '{CD}')
             input = input.replaceAll(/(?i)CloudBees Core/, '{CI}')
